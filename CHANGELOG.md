@@ -1,5 +1,13 @@
 # Release history
 
+## Version 1.2 — 2026-10-08
+- Added public customer booking at /book, with no customer login required.
+- Added a restricted public catalog/availability/booking API using the existing transactional scheduling engine.
+- Added public request limits, policy consent, stale-quote protection, idempotent submissions and a hidden anti-bot field.
+- Added owner dashboard booking-link copy/open actions and 30-second refresh outside Settings.
+- Changed the theme to charcoal, navy and steel blue.
+- Preserved existing records, owner authentication and the 6-character admin password minimum.
+
 ## Version 1.1 — 2026-10-08
 - Reduced ADMIN_PASSWORD minimum length from 16 to 6 characters.
 - Updated setup instructions and environment example.

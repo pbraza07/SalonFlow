@@ -21,5 +21,6 @@ try{
  }
  await client.query('DELETE FROM sessions WHERE expires_at<=now()');
  await client.query("DELETE FROM login_attempts WHERE window_start<now()-interval '1 day'");
+ await client.query("DELETE FROM public_limits WHERE window_start<now()-interval '1 day'");
  await client.query('COMMIT');console.log('Database migrations and owner account are ready.');
 }catch(e){await client.query('ROLLBACK');console.error('Database initialization failed. Check database and administrator environment settings.');throw e;}finally{client.release();await pool.end();}

@@ -12,3 +12,6 @@ Not verified here: deployment in your GitHub/Render accounts, full live-PostgreS
 
 ## Version 1.1 validation
 Startup validation rejects a 5-character password and accepts 6- and 16-character passwords, then proceeds to database configuration validation. No database or deployed account was changed. The version 1 build and other test results above were not rerun for this small policy/documentation change.
+
+## Version 1.2 validation
+TypeScript validation and all five automated test groups passed. The new public handler test uses embedded PostgreSQL and verifies public catalog redaction, owner API rejection of anonymous requests, blocked public settings mutations, explicit policy acceptance, stale-price rejection, persistent booking creation, same-key retry, slot conflict rejection, correct owner/online-channel assignment and cross-origin rejection. Production build and route-render smoke checks are recorded with this release. Live Render database deployment and full browser visual QA still require verification in your installation.

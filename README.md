@@ -1,4 +1,4 @@
-# SalonFlow Studio — Version 1.1
+# SalonFlow Studio — Version 1.2
 
 A standalone hair salon and barbershop management app for your own GitHub repository and Render account.
 
@@ -7,6 +7,8 @@ A standalone hair salon and barbershop management app for your own GitHub reposi
 Start with [DEPLOY_RENDER.md](DEPLOY_RENDER.md).
 
 ## Included
+- Public `/book` page with live availability, server-confirmed bookings and confirmation printing.
+- Charcoal/navy/steel-blue theme and a dashboard button to copy the customer link.
 - Owner email/password login, password hashing, 12-hour server-side sessions, logout and database-backed login throttling.
 - Multi-service appointment creation, staff qualification matching, server-checked available times and cleanup buffers.
 - PostgreSQL transactions and a unique owner/date/staff/minute reservation constraint to reject overlaps.
@@ -16,8 +18,8 @@ Start with [DEPLOY_RENDER.md](DEPLOY_RENDER.md).
 - Deterministic guided FAQ assistant using configured services, hours and policy, with saved human-handoff requests.
 - Clearly labeled sample appointments; samples are never saved as actual bookings or financial transactions.
 
-## Version 1 scope
-This is a single-owner, single-business first release. Customer booking is an authenticated preview managed by the owner, not a public client portal. The receptionist is a guided FAQ assistant, not generative AI. Additional production features from the master prompt remain unimplemented: public booking, customer/staff accounts and roles, staff breaks/holidays/time off, rescheduling, resource/chair capacity, checkout holds, provider payments/deposits/refunds, SMS/email reminders, true AI/voice, inventory ledger, packages, memberships, gift cards, full expenses/profit accounting, and multi-location/tenant onboarding. Do not represent those as active features.
+## Current scope
+This is a single-owner, single-business first release. Customers can book at `/book` without logging in. The owner dashboard remains protected. There are no customer accounts or customer self-service cancellation/rescheduling yet. The receptionist is a guided FAQ assistant, not generative AI. Additional production features from the master prompt remain unimplemented: customer/staff accounts and roles, staff breaks/holidays/time off, rescheduling, resource/chair capacity, checkout holds, provider payments/deposits/refunds, SMS/email reminders, true AI/voice, inventory ledger, packages, memberships, gift cards, full expenses/profit accounting, and multi-location/tenant onboarding. Do not represent those as active features.
 
 Hours apply every day in America/New_York; configure daytime hours only. Booking durations and buffers use 15-minute increments. Existing bookings keep their original quoted price and reserved buffer. A settings change that alters a price/duration while booking is open rejects stale confirmation and asks for review.
 
@@ -46,12 +48,15 @@ The database migration requires PostgreSQL, not SQLite. Startup migrations are v
 - `npm run db:migrate` — apply pending migrations and provision/update owner
 
 ## Data and access
-Every studio API action requires a valid session. User IDs come from server-side sessions, never browser identity headers. The owner page redirects to login when unauthenticated; API data is not returned to anonymous callers. State-changing endpoints require same-origin requests. Passwords use salted scrypt, and the database stores only hashes of random session tokens. Production cookies are Secure and HttpOnly. Use HTTPS in production. No third-party payment credentials are collected.
+Every owner studio API action requires a valid session. The separate public `/api/booking` endpoint permits only catalog retrieval, availability lookup and new booking creation. It never returns client records, owner email, sales, costs or internal events. Public booking adds database rate limits and a hidden anti-bot field; it does not include CAPTCHA or email identity verification. User IDs come from server-side sessions, never browser identity headers. The owner page redirects to login when unauthenticated; API data is not returned to anonymous callers. State-changing endpoints require same-origin requests. Passwords use salted scrypt, and the database stores only hashes of random session tokens. Production cookies are Secure and HttpOnly. Use HTTPS in production. No third-party payment credentials are collected.
 
 Database access is internal-only in render.yaml (`ipAllowList: []`). Configure backup/restore retention in your Render database before using real customer records. Never commit `.env.local`, credentials, database dumps, `node_modules`, or `.next`.
 
 ## Release numbering
-This is **version 1.1**. Subsequent requested releases will be **1.2, 1.3, 1.4**, and onward. See CHANGELOG.md. Replace source files in the existing repository when upgrading; preserve the Render database and apply additive migrations. Do not restore an older source version across incompatible migrations without a migration plan.
+This is **version 1.2**. Subsequent requested releases will be **1.3, 1.4, 1.5**, and onward. See CHANGELOG.md. Replace source files in the existing repository when upgrading; preserve the Render database and apply additive migrations. Do not restore an older source version across incompatible migrations without a migration plan.
 
 ## Acceptance checks after deployment
 Sign in, create a test appointment, refresh and confirm it persists; open a second browser session and confirm the same slot cannot be double-booked; cancel it and confirm capacity is released. Record a test cash sale only if clearly kept separate from real business records. Sign out and verify `/api/studio` returns 401. Verify the custom domain origin after setting APP_URL. Complete these checks in your actual Render account before opening operations.
+
+## Sharing the booking link
+Deploy this release to the existing Render web service. Use **Copy customer link** in the sidebar or open your normal app URL with `/book` appended. Example only: `https://YOUR-SERVICE.onrender.com/book`. Do not share the owner login credentials. The owner appointment list refreshes every 30 seconds while outside Settings, or immediately on page refresh.
