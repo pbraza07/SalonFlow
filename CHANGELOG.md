@@ -1,5 +1,10 @@
 # Release history
 
+## Version 1.1 — 2026-10-08
+- Reduced ADMIN_PASSWORD minimum length from 16 to 6 characters.
+- Updated setup instructions and environment example.
+- Existing passwords continue to work; change ADMIN_PASSWORD in Render and restart to set a new password.
+
 ## Version 1 — 2026-10-08
 - Standalone GitHub + Render distribution.
 - Standard Next.js Node server and PostgreSQL persistence.
@@ -11,5 +16,5 @@
 ## Version convention
 User-facing releases: 1, 1.1, 1.2, 1.3, …
 ZIP filenames: SalonFlow_Studio_v1.zip, SalonFlow_Studio_v1.1.zip, …
-The package.json machine version for version 1 is 1.0.0; version 1.1 will use 1.1.0.
+The package.json machine version for version 1 is 1.0.0; version 1.1 uses 1.1.0.
 Do not create an empty new version without actual changes.

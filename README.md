@@ -1,4 +1,4 @@
-# SalonFlow Studio — Version 1
+# SalonFlow Studio — Version 1.1
 
 A standalone hair salon and barbershop management app for your own GitHub repository and Render account.
 
@@ -29,7 +29,7 @@ Next.js + React + TypeScript, Node.js, PostgreSQL (`pg`). Standard npm commands;
 ## Local development
 1. Install Node 22.22 or another supported Node 22/24 release and PostgreSQL 17+.
 2. Copy `.env.example` to `.env.local`.
-3. Set a local `DATABASE_URL`, your `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD` of at least 16 characters.
+3. Set a local `DATABASE_URL`, your `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD` of at least 6 characters.
 4. Run `npm ci`.
 5. Run `npm run db:migrate`.
 6. Run `npm run dev` and open `http://localhost:3000`.
@@ -51,7 +51,7 @@ Every studio API action requires a valid session. User IDs come from server-side
 Database access is internal-only in render.yaml (`ipAllowList: []`). Configure backup/restore retention in your Render database before using real customer records. Never commit `.env.local`, credentials, database dumps, `node_modules`, or `.next`.
 
 ## Release numbering
-This is **version 1**. Subsequent requested releases will be **1.1, 1.2, 1.3**, and onward. See CHANGELOG.md. Replace source files in the existing repository when upgrading; preserve the Render database and apply additive migrations. Do not restore an older source version across incompatible migrations without a migration plan.
+This is **version 1.1**. Subsequent requested releases will be **1.2, 1.3, 1.4**, and onward. See CHANGELOG.md. Replace source files in the existing repository when upgrading; preserve the Render database and apply additive migrations. Do not restore an older source version across incompatible migrations without a migration plan.
 
 ## Acceptance checks after deployment
 Sign in, create a test appointment, refresh and confirm it persists; open a second browser session and confirm the same slot cannot be double-booked; cancel it and confirm capacity is released. Record a test cash sale only if clearly kept separate from real business records. Sign out and verify `/api/studio` returns 401. Verify the custom domain origin after setting APP_URL. Complete these checks in your actual Render account before opening operations.

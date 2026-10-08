@@ -3,7 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {getPool} from '../server/database.mjs';
 import {hashPassword,verifyPassword} from '../server/security.mjs';
 const email=process.env.ADMIN_EMAIL?.trim().toLowerCase();const password=process.env.ADMIN_PASSWORD;
-if(!email||!/^\S+@\S+\.\S+$/.test(email)||!password||password.length<16)throw Error('Set ADMIN_EMAIL and ADMIN_PASSWORD (at least 16 characters) before startup.');
+if(!email||!/^\S+@\S+\.\S+$/.test(email)||!password||password.length<6)throw Error('Set ADMIN_EMAIL and ADMIN_PASSWORD (at least 6 characters) before startup.');
 const pool=getPool();const client=await pool.connect();
 try{
  await client.query('BEGIN');await client.query('SELECT pg_advisory_xact_lock(81371001)');

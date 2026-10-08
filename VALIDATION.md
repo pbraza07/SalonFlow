@@ -9,3 +9,6 @@ Verified in the build environment on October 8, 2026:
 - Runtime source/dependencies contain no ChatGPT authentication, Sites, Cloudflare or OpenAI integrations.
 
 Not verified here: deployment in your GitHub/Render accounts, full live-PostgreSQL login and booking flows, visual browser interaction, provider payments or messaging. Follow the post-deployment acceptance checks in README.md. Those provider features are not included in version 1.
+
+## Version 1.1 validation
+Startup validation rejects a 5-character password and accepts 6- and 16-character passwords, then proceeds to database configuration validation. No database or deployed account was changed. The version 1 build and other test results above were not rerun for this small policy/documentation change.

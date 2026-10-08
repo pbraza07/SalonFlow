@@ -1,10 +1,10 @@
-# Deploy SalonFlow version 1 with GitHub + Render
+# Deploy SalonFlow version 1.1 with GitHub + Render
 
 ## 1. Extract and upload to GitHub
-1. Download `SalonFlow_Studio_v1.zip` and extract it.
-2. Open the extracted `salonflow-v1` folder. It contains `package.json`, `package-lock.json`, `render.yaml`, `app`, `server`, and the other source files.
+1. Download `SalonFlow_Studio_v1.1.zip` and extract it.
+2. Open the extracted `salonflow-v1.1` folder. It contains `package.json`, `package-lock.json`, `render.yaml`, `app`, `server`, and the other source files.
 3. In GitHub, create a **private repository**, for example `salonflow-studio`.
-4. Upload the **contents** of `salonflow-v1` into the repository root, not the enclosing folder. `package.json` and `render.yaml` must be visible immediately when opening the repository.
+4. Upload the **contents** of `salonflow-v1.1` into the repository root, not the enclosing folder. `package.json` and `render.yaml` must be visible immediately when opening the repository.
 5. Commit the files. Include `.gitignore`, `.node-version`, and `.env.example` if using GitHub Desktop or Git. Do not upload `.env.local`.
 
 For Git command-line users, run these inside the extracted folder, replacing YOUR_USERNAME:
@@ -12,7 +12,7 @@ For Git command-line users, run these inside the extracted folder, replacing YOU
 ```bash
 git init
 git add .
-git commit -m "SalonFlow version 1"
+git commit -m "SalonFlow version 1.1"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/salonflow-studio.git
 git push -u origin main
@@ -28,7 +28,7 @@ git push -u origin main
 | Variable | Value |
 |---|---|
 | ADMIN_EMAIL | Your owner email address |
-| ADMIN_PASSWORD | Your unique password, at least 16 characters; store it securely |
+| ADMIN_PASSWORD | Your unique password, at least 6 characters; store it securely |
 
 6. Deploy the Blueprint. `DATABASE_URL` is populated automatically from the database's internal connection string. Render also supplies `RENDER_EXTERNAL_URL`.
 7. Wait for the web service to report healthy, then open its `.onrender.com` URL.
@@ -53,12 +53,12 @@ The initial sample appointments are clearly labeled and are not database records
 4. Redeploy and use that address for login and normal operations. Once APP_URL is set, the original Render URL will not accept state-changing requests because origin protection only trusts the configured domain.
 
 ## 5. Future releases
-Version 1.1, 1.2 and later will arrive as new ZIPs. Replace the source files in the same GitHub repository and commit the update. Keep the existing Render services, environment settings, and PostgreSQL database. Trigger a deployment or use your configured GitHub automatic deployment setting.
+Version 1.2, 1.3 and later will arrive as new ZIPs. Replace the source files in the same GitHub repository and commit the update. Keep the existing Render services, environment settings, and PostgreSQL database. Trigger a deployment or use your configured GitHub automatic deployment setting.
 
 ## Troubleshooting
 - **Build cannot find package.json:** move the ZIP's inner files to the repository root or set the correct Render root directory.
 - **Database unavailable/startup failure:** inspect server logs and verify DATABASE_URL and database status. Use the internal connection string for colocated Render resources.
-- **Owner setup failed:** ADMIN_PASSWORD must have at least 16 characters; ADMIN_EMAIL must be valid.
+- **Owner setup failed:** ADMIN_PASSWORD must have at least 6 characters; ADMIN_EMAIL must be valid.
 - **Incorrect credentials:** use the exact configured email/password; update Render's environment values and restart to reset credentials.
 - **Too many login attempts:** wait 15 minutes.
 - **Invalid request origin:** verify APP_URL matches the exact HTTPS address in your browser. Leave APP_URL unset when using the default Render URL.
