@@ -20,3 +20,28 @@
 
 .site[data-selah-theme] .servicesSection h2,.site[data-selah-theme] .servicesHeading h2{color:var(--sf-on-page)}
 .site[data-selah-theme] .servicesSection>p,.site[data-selah-theme] .servicesHeading p{color:var(--sf-on-page)}
+
+
+/* v1.3.6: the entire individual business page honors the business theme, not platform homepage. */
+.site[data-selah-theme] .header,.site[data-selah-theme] .header nav{color:var(--sf-on-header)}
+.site[data-selah-theme] .header a,.site[data-selah-theme] .footer a{color:var(--sf-on-header)!important}
+.site[data-selah-theme] .footer a{color:var(--sf-on-footer)!important}
+.site[data-selah-theme] .businessHero{color:var(--sf-on-hero)}
+.site[data-selah-theme] .businessHero h1{color:var(--sf-heading-on-hero)!important}
+.site[data-selah-theme] .businessHero p,.site[data-selah-theme] .kicker,.site[data-selah-theme] .businessLocation{color:var(--sf-on-hero)!important}
+.site[data-selah-theme] .businessLocation a{color:var(--sf-on-hero)!important}
+.site[data-selah-theme] .servicesSection h2{color:var(--sf-heading-on-page)!important}
+.site[data-selah-theme] .servicesSection>p{color:var(--sf-text-readable)!important}
+.site[data-selah-theme] .serviceCards article h3{color:var(--sf-on-card)!important}
+.site[data-selah-theme] .serviceCards article p,.site[data-selah-theme] .serviceDetails span,.site[data-selah-theme] .serviceDetails strong{color:var(--sf-on-card)!important}
+.site[data-selah-theme] .serviceDetails{border-color:var(--sf-border)}
+.site[data-selah-theme] .emptyCatalog{background:var(--sf-card);border-color:var(--sf-border);color:var(--sf-on-card)}
+.site[data-selah-theme] .emptyCatalog h3,.site[data-selah-theme] .emptyCatalog p{color:var(--sf-on-card)!important}
+.site[data-selah-theme] .featured h2,.site[data-selah-theme] .featured p{color:var(--sf-on-policy)!important}
+.site[data-selah-theme] .button{background:var(--sf-button)!important;color:var(--sf-on-button)!important;border-color:var(--sf-button)!important;font-family:var(--sf-body-font)!important}
+.site[data-selah-theme] .button:hover{background:var(--sf-button-hover)!important;color:var(--sf-on-button-hover)!important}
+.site[data-selah-theme] .outline{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important;border-color:var(--sf-border)!important;font-family:var(--sf-body-font)!important}
+.site[data-selah-theme] .outline:hover{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important}
+.site[data-selah-theme] .footer{background:var(--sf-footer);color:var(--sf-on-footer)}
+.site[data-selah-theme] h1,.site[data-selah-theme] h2,.site[data-selah-theme] h3,.site[data-selah-theme] h4{font-family:var(--sf-heading-font)!important}
+
