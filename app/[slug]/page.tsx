@@ -14,7 +14,7 @@ export default async function BusinessPage({params}:{params:Promise<{slug:string
  if(!/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(slug))notFound();
  const row=(await getPool().query("SELECT b.name,b.slug,b.industry,b.description,b.city,b.region,b.brand_primary,b.brand_background,b.business_model,EXISTS(SELECT 1 FROM business_logos l WHERE l.business_id=b.id) AS has_logo,s.data FROM businesses b LEFT JOIN settings s ON s.owner=b.owner_id WHERE b.slug=$1 AND b.status='active' LIMIT 1",[slug])).rows[0] as Row|undefined;
  if(!row)notFound();
- let config:{tagline?:string;services?:Service[]}={};try{config=row.data?JSON.parse(row.data):{};}catch{}
+ let config:{tagline?:string;services?:Service[];theme?:any}={};try{config=row.data?JSON.parse(row.data):{};}catch{}
  const services=(Array.isArray(config.services)?config.services:[]).filter(s=>s&&typeof s.name==='string'&&Number.isFinite(s.price)&&Number.isFinite(s.duration)).slice(0,30);
  const price=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
  const theme={...themeStyles(config.theme,row.brand_primary,row.brand_background),'--forest':row.brand_primary,'--forest-deep':row.brand_primary,'--cream':row.brand_background} as CSSProperties;
