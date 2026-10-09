@@ -6,6 +6,7 @@ Version 1.3 is a **development foundation**, not a Fresha-equivalent production 
 ## Implemented in branch v1.3
 - Additive businesses, platform admin, business memberships, plan, merchant-account, referral and AI-cost database tables. Merchant, referral and usage records are **storage only**; integrations are not wired up.
 - Preserve the initial platform admin identity across deployments; prevent startup from overwriting newly registered owner credentials.
+- Register the existing original studio as the first platform business with permanently reserved slug `crawford`. Canonical customer booking URL is `/book/crawford`; legacy `/book` also targets Crawford. Keep the original owner ID and all existing appointments, settings and team members.
 - Public business signup with own authenticated owner session and isolated settings.
 - Public /book/[slug] route reusing the current booking engine; legacy /book continues serving the original business.
 - Owner-dashboard link resolves to its business slug.
