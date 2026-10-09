@@ -18,7 +18,7 @@ export async function POST(req:Request){
  const {userId,role}=await auth(req);if(role!=='primary')return deny(403,'Primary administrator only.');
  const raw=await req.text();if(raw.length>1600)return deny(413,'Request too large.');
  const b=JSON.parse(raw),email=String(b.email||'').trim().toLowerCase(),password=b.password;
- if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||!validNewPassword(password)||email===PRIMARY_PLATFORM_EMAIL)return deny(400,'Use another administrator email and a 12+ character password.');
+ if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||!validNewPassword(password)||email===PRIMARY_PLATFORM_EMAIL)return deny(400,'Use another administrator email and a 6+ character password.');
  const pool=getPool(),client=await pool.connect();try{
  await client.query('BEGIN');
  if((await client.query('SELECT 1 FROM users WHERE email=$1',[email])).rowCount){await client.query('ROLLBACK');return deny(409,'Email is already registered.');}

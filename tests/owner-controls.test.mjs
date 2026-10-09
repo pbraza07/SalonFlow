@@ -19,7 +19,7 @@ test('v1.3.3 migration preserves Crawford, brands and authorizes only assigned a
  }finally{await db.close();}
 });
 test('admin password policy and team entitlement are enforced by APIs',async()=>{
- assert.equal(PRIMARY_PLATFORM_EMAIL,'pbraza@gmail.com');assert.equal(validNewPassword('123456'),false);assert.equal(validNewPassword('long-unique-passphrase'),true);
+ assert.equal(PRIMARY_PLATFORM_EMAIL,'pbraza@gmail.com');assert.equal(validNewPassword('123456'),true);assert.equal(validNewPassword('12345'),false);assert.equal(validNewPassword('a'.repeat(128)),true);assert.equal(validNewPassword('a'.repeat(129)),false);assert.equal(validNewPassword('long-unique-passphrase'),true);
  const studio=await readFile(new URL('../lib/studio-handler.ts',import.meta.url),'utf8');
  assert.match(studio,/Team member limit reached/);assert.match(studio,/future bookings before removing/);assert.match(studio,/business_subscriptions/);
  const pass=await readFile(new URL('../app/api/account/password/route.ts',import.meta.url),'utf8');

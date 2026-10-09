@@ -1,3 +1,8 @@
+## Version 1.3.4 — October 9, 2026
+- Unified six-character minimum for new owner passwords, password changes, administrator invites, sign-in and startup.
+- Matched server validation, browser form limits, user-visible messages and tests.
+- No database migrations or existing account password resets.
+
 ## Version 1.3.3 — October 9, 2026
 - Customizable business logo, brand colors, and business model.
 - Add/remove service types and staff, with server-side plan enforcement.

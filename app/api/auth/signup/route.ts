@@ -2,6 +2,7 @@ import {randomBytes,randomUUID} from 'node:crypto';
 import {getPool} from '../../../../server/database.mjs';
 import {hashPassword,tokenHash,validOrigin,cookie} from '../../../../server/security.mjs';
 import {defaultSettings} from '../../../../lib/defaults';
+import {validNewPassword} from '../../../../server/platform-roles.mjs';
 import {isReservedBusinessSlug,dashboardPath,businessPath,bookingPath} from '../../../../server/route-slugs.mjs';
 export const runtime='nodejs';
 const industries=new Set(['barber','hair','nails','pet-grooming','spa','massage','fitness','tutoring','cleaning','auto-detailing','custom']);
@@ -19,10 +20,10 @@ export async function POST(req:Request){
   const password=b.password;
   if(isReservedBusinessSlug(slug))return Response.json({error:'This booking URL is reserved for the original business.'},{status:409});
   if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||
-    typeof password!=='string'||password.length<12||password.length>256||
+    !validNewPassword(password)||
     name.length<2||name.length>100||!industries.has(industry)||
     !/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(slug))
-    return Response.json({error:'Enter a valid business name, URL slug, email and password (12+ characters).'},{status:400});
+    return Response.json({error:'Enter a valid business name, URL slug, email and password (6+ characters).'},{status:400});
   const pool=getPool();
   const ip=(req.headers.get('x-forwarded-for')||'unknown').split(',').at(-1)!.trim();
   const limit=await pool.query("INSERT INTO public_limits(key,count,window_start) VALUES($1,1,now()) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN public_limits.window_start<now()-interval '1 hour' THEN 1 ELSE public_limits.count+1 END,window_start=CASE WHEN public_limits.window_start<now()-interval '1 hour' THEN now() ELSE public_limits.window_start END RETURNING count",['signup:'+tokenHash(ip)]);

@@ -1,6 +1,10 @@
+# SelahFlow v1.3.4 — Password Minimum of Six Characters
+
+This maintenance patch aligns password creation, change, administrator invitation, login and startup at a minimum of six characters. Existing v1.3.3 features and all account/business data remain untouched. Use long, unique passwords for stronger security.
+
 # SelahFlow v1.3.3 — Owner Controls
 
-New business-specific colors, logo uploads, descriptions, service catalog + team editors, server-enforced team subscription caps, self-service password changes, and primary administrator invitations. The original Crawford data remains intact. The primary administrator email is pbraza@gmail.com; passwords are not embedded in source, and new passwords must be at least 12 characters. Paid subscription activation is not implemented.
+New business-specific colors, logo uploads, descriptions, service catalog + team editors, server-enforced team subscription caps, self-service password changes, and primary administrator invitations. The original Crawford data remains intact. The primary administrator email is pbraza@gmail.com; passwords are not embedded in source, and new passwords must be at least 6 characters. Paid subscription activation is not implemented.
 
 See [v1.3.3 guide](docs/RELEASE_v1.3.3_OWNER_CONTROLS.md).
 
