@@ -16,6 +16,7 @@ export async function POST(req:Request){
   const slug=String(b.slug||'').trim().toLowerCase();
   const industry=String(b.industry||'custom');
   const password=b.password;
+  if(slug==='crawford')return Response.json({error:'This booking URL is reserved for the original business.'},{status:409});
   if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||
     typeof password!=='string'||password.length<12||password.length>256||
     name.length<2||name.length>100||!industries.has(industry)||
