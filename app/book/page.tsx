@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import {Scissors,Clock,MapPin,Check,ChevronLeft,Phone,CalendarDays} from 'lucide-react';
 import {today,timeLabel} from '../../lib/defaults';
 const money=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
-const bookingApi=()=>{if(typeof window==='undefined')return '/api/booking';const match=window.location.pathname.match(/^\\/book\\/([a-z0-9-]+)\\/?$/);return '/api/booking'+(match?'?slug='+encodeURIComponent(match[1]):'');};
+const bookingApi=()=>{if(typeof window==='undefined')return '/api/booking';const parts=window.location.pathname.split('/').filter(Boolean);const slug=parts.length===2&&parts[0]==='book'?parts[1]:null;return '/api/booking'+(slug?'?slug='+encodeURIComponent(slug):'');};
 export default function Booking(){
  const [config,setConfig]=useState<any>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[step,setStep]=useState(1),[selected,setSelected]=useState<string[]>([]),[staff,setStaff]=useState(''),[date,setDate]=useState(today()),[times,setTimes]=useState<number[]>([]),[checked,setChecked]=useState(false),[time,setTime]=useState<number|null>(null),[done,setDone]=useState(''),[name,setName]=useState(''),[email,setEmail]=useState(''),[phone,setPhone]=useState(''),[accepted,setAccepted]=useState(false),[website,setWebsite]=useState('');
  const key=useRef('');const requestNumber=useRef(0);
