@@ -1,3 +1,9 @@
+## Version 1.3.3 — October 9, 2026
+- Customizable business logo, brand colors, and business model.
+- Add/remove service types and staff, with server-side plan enforcement.
+- Secure owner password changes; invited administrators managed by primary account.
+- Role-based platform admin route, preserving original appointments and business data.
+
 ## Version 1.3.2 — October 9, 2026
 - Separate public platform home from per-business dashboards.
 - Add Crawford public profile and private workspace.
