@@ -3,9 +3,10 @@ import {getPool} from '../../../../server/database.mjs';
 import {hashPassword,tokenHash,validOrigin,cookie} from '../../../../server/security.mjs';
 import {defaultSettings} from '../../../../lib/defaults';
 import {validNewPassword} from '../../../../server/platform-roles.mjs';
+import {BUSINESS_INDUSTRIES,canonicalState} from '../../../../lib/business-options';
 import {isReservedBusinessSlug,dashboardPath,businessPath,bookingPath} from '../../../../server/route-slugs.mjs';
 export const runtime='nodejs';
-const industries=new Set(['barber','hair','nails','pet-grooming','spa','massage','fitness','tutoring','cleaning','auto-detailing','custom']);
+const industries=new Set<string>([...BUSINESS_INDUSTRIES.map(([id])=>id),'custom']);
 export async function POST(req:Request){
  if(!validOrigin(req))return Response.json({error:'Invalid request origin.'},{status:403});
  try{
@@ -16,12 +17,13 @@ export async function POST(req:Request){
   const email=String(b.email||'').trim().toLowerCase();
   const name=String(b.businessName||'').trim();
   const slug=String(b.slug||'').trim().toLowerCase();
-  const industry=String(b.industry||'custom');
+  const industry=String(b.industry||'other');
+  const city=String(b.city||'').trim(),region=canonicalState(String(b.region||''));
   const password=b.password;
   if(isReservedBusinessSlug(slug))return Response.json({error:'This booking URL is reserved for the original business.'},{status:409});
   if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||
     !validNewPassword(password)||
-    name.length<2||name.length>100||!industries.has(industry)||
+    name.length<2||name.length>100||city.length>80||(b.region&&!region)||!industries.has(industry)||
     !/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(slug))
     return Response.json({error:'Enter a valid business name, URL slug, email and password (6+ characters).'},{status:400});
   const pool=getPool();
@@ -34,7 +36,7 @@ export async function POST(req:Request){
   try{
    await client.query('BEGIN');
    await client.query('INSERT INTO users(id,email,password_hash) VALUES($1,$2,$3)',[userId,email,hashPassword(password)]);
-   await client.query('INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES($1,$2,$3,$4,$5)',[businessId,userId,slug,name,industry]);
+   await client.query("INSERT INTO businesses(id,owner_id,slug,name,industry,city,region,status,is_listed,listing_requested) VALUES($1,$2,$3,$4,$5,$6,$7,'pending',FALSE,FALSE)",[businessId,userId,slug,name,industry,city,region]);
    await client.query("INSERT INTO business_memberships(business_id,user_id,role) VALUES($1,$2,'owner')",[businessId,userId]);
    await client.query("INSERT INTO business_subscriptions(business_id,plan_code,status) VALUES($1,'free','active')",[businessId]);
    await client.query('INSERT INTO settings(owner,data) VALUES($1,$2)',[userId,JSON.stringify(config)]);
@@ -45,6 +47,6 @@ export async function POST(req:Request){
    if((error as {code?:string}).code==='23505')return Response.json({error:'This email or booking URL is already registered.'},{status:409});
    throw error;
   }finally{client.release();}
-  return Response.json({ok:true,slug,bookingUrl:bookingPath(slug),dashboardUrl:dashboardPath(slug),businessUrl:businessPath(slug)},{status:201,headers:{'Set-Cookie':cookie(session),'Cache-Control':'no-store'}});
+  return Response.json({ok:true,slug,status:'pending',bookingUrl:bookingPath(slug),dashboardUrl:'/registration-status',businessUrl:businessPath(slug)},{status:201,headers:{'Set-Cookie':cookie(session),'Cache-Control':'no-store'}});
  }catch(error){console.error('Business registration failed',error);return Response.json({error:'Registration is temporarily unavailable.'},{status:503});}
 }

@@ -18,8 +18,8 @@ export async function POST(req:Request){
   const token=randomBytes(32).toString('hex');
   await pool.query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[tokenHash(token),user.id]);
   await pool.query('DELETE FROM login_attempts WHERE key=$1',[key]);
-  const business=(await pool.query("SELECT slug FROM businesses WHERE owner_id=$1 AND status='active' LIMIT 1",[user.id])).rows[0];
-  const target=business?dashboardPath(business.slug):await getPlatformRole(pool,user.id)?'/admin/platform':'/';
+  const business=(await pool.query("SELECT slug,status FROM businesses WHERE owner_id=$1 LIMIT 1",[user.id])).rows[0];
+  const target=business?(business.status==='active'?dashboardPath(business.slug):'/registration-status'):await getPlatformRole(pool,user.id)?'/admin/platform':'/';
   return Response.json({ok:true,dashboardUrl:target},{headers:{'Set-Cookie':cookie(token),'Cache-Control':'no-store'}});
  }catch(error){console.error('Login unavailable',error);return Response.json({error:'Sign-in is temporarily unavailable. Check the server database configuration.'},{status:503});}
 }
