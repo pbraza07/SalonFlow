@@ -2,6 +2,7 @@ import {randomBytes} from 'node:crypto';
 import {getPool} from '../../../../server/database.mjs';
 import {verifyPassword,tokenHash,validOrigin,cookie} from '../../../../server/security.mjs';
 import {dashboardPath} from '../../../../server/route-slugs.mjs';
+import {getPlatformRole} from '../../../../server/platform-roles.mjs';
 export const runtime='nodejs';
 export async function POST(req:Request){
  if(!validOrigin(req))return Response.json({error:'Invalid request origin.'},{status:403});
@@ -18,7 +19,7 @@ export async function POST(req:Request){
   await pool.query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[tokenHash(token),user.id]);
   await pool.query('DELETE FROM login_attempts WHERE key=$1',[key]);
   const business=(await pool.query("SELECT slug FROM businesses WHERE owner_id=$1 AND status='active' LIMIT 1",[user.id])).rows[0];
-  const target=business?dashboardPath(business.slug):'/';
+  const target=business?dashboardPath(business.slug):await getPlatformRole(pool,user.id)?'/admin/platform':'/';
   return Response.json({ok:true,dashboardUrl:target},{headers:{'Set-Cookie':cookie(token),'Cache-Control':'no-store'}});
  }catch(error){console.error('Login unavailable',error);return Response.json({error:'Sign-in is temporarily unavailable. Check the server database configuration.'},{status:503});}
 }

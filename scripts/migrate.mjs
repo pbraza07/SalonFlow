@@ -1,7 +1,8 @@
 import {readFile,readdir} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 import {getPool} from '../server/database.mjs';
-import {hashPassword,verifyPassword} from '../server/security.mjs';
+import {hashPassword} from '../server/security.mjs';
+import {PRIMARY_PLATFORM_EMAIL} from '../server/platform-roles.mjs';
 const email=process.env.ADMIN_EMAIL?.trim().toLowerCase();const password=process.env.ADMIN_PASSWORD;
 if(!email||!/^\S+@\S+\.\S+$/.test(email)||!password||password.length<6)throw Error('Set ADMIN_EMAIL and ADMIN_PASSWORD (at least 6 characters) before startup.');
 const pool=getPool();const client=await pool.connect();
@@ -16,14 +17,11 @@ try{
  // Preserve the original platform admin account after public owner registration begins.
  const existing=(await client.query('SELECT users.id,users.email,users.password_hash FROM platform_admins JOIN users ON users.id=platform_admins.user_id LIMIT 1')).rows[0]||(await client.query('SELECT id,email,password_hash FROM users ORDER BY created_at LIMIT 1')).rows[0];
  if(!existing){await client.query('INSERT INTO users(id,email,password_hash) VALUES($1,$2,$3)',[randomUUID(),email,hashPassword(password)]);}
- else if(existing.email!==email||!verifyPassword(password,existing.password_hash)){
-  await client.query('UPDATE users SET email=$1,password_hash=$2 WHERE id=$3',[email,hashPassword(password),existing.id]);
-  await client.query('DELETE FROM sessions WHERE user_id=$1',[existing.id]);
- }
+ else if(existing.email!==email){throw Error('ADMIN_EMAIL does not match the original owner. Startup will not reassign account identity.');}
  // Backfill the original studio. New owners receive these rows atomically at signup.
  const admin=(await client.query('SELECT id FROM users WHERE email=$1',[email])).rows[0];
  if(!admin)throw Error('Platform admin could not be identified.');
- await client.query('INSERT INTO platform_admins(user_id) VALUES($1) ON CONFLICT DO NOTHING',[admin.id]);
+ if(email===PRIMARY_PLATFORM_EMAIL)await client.query("INSERT INTO platform_admins(user_id,role) VALUES($1,'primary') ON CONFLICT(user_id) DO UPDATE SET role='primary'",[admin.id]);
  const priorSettings=(await client.query('SELECT data FROM settings WHERE owner=$1',[admin.id])).rows[0];
  let studioName='SalonFlow Studio';
  try{studioName=JSON.parse(priorSettings?.data||'{}').name||studioName;}catch{}
