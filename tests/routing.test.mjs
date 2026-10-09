@@ -19,7 +19,7 @@ test('owner dashboard requires session and enforces slug',async()=>{
  assert.match(source,/if\(actualSlug!==slug\)redirect/);
  const signup=await read('app/api/auth/signup/route.ts');
  assert.match(signup,/isReservedBusinessSlug\(slug\)/);
- assert.match(signup,/dashboardUrl:dashboardPath\(slug\)/);
+ assert.match(signup,/dashboardUrl:'\/registration-status'/);
  const login=await read('app/api/auth/login/route.ts');
  assert.match(login,/dashboardUrl:target/);
 });
