@@ -1,3 +1,9 @@
+# v1.5 — Browser icon refresh
+
+- Use the deep-teal Pause & Flow app icon as the browser-tab and shortcut icon on all routes.
+- Give the icon a new versioned URL so browsers can stop reusing the old purple SF favicon.
+- No business data, routes, authentication, workflows or deployment settings changed.
+
 # SelahFlow release history
 
 ## Version 1.4 — Branding only — 2026-10-09

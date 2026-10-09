@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   title: "SelahFlow | Smart booking & AI receptionist.",
   description: "Your bookings flow. You breathe. Smart booking & AI receptionist.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: [{ url: "/brand/app-icon.svg?v=1.5", type: "image/svg+xml" }],
+    shortcut: "/brand/app-icon.svg?v=1.5",
   },
 };
 
