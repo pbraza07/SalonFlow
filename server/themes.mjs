@@ -43,7 +43,7 @@ export function themeStyles(raw,primary,background){
  for(const id of ['header','hero','page','surface','card','policy','footer','button','buttonHover','secondaryButton','selected','step','input']){
   out['--sf-on-'+id.replace(/[A-Z]/g,x=>'-'+x.toLowerCase())]=accessibleText(c[id],c.text);
  }
- out['--sf-heading-readable']=accessibleText(c.hero,c.heading);out['--sf-text-readable']=accessibleText(c.page,c.text);
+ out['--sf-heading-on-page']=accessibleText(c.page,c.heading);out['--sf-heading-on-hero']=accessibleText(c.hero,c.heading);out['--sf-heading-on-surface']=accessibleText(c.surface,c.heading);out['--sf-link-on-surface']=accessibleText(c.surface,c.link);out['--sf-heading-readable']=accessibleText(c.hero,c.heading);out['--sf-text-readable']=accessibleText(c.page,c.text);
  out['--sf-muted-readable']=accessibleText(c.page,c.muted);out['--sf-link-readable']=accessibleText(c.page,c.link);
  out['--sf-body-font']=FONTS.find(f=>f[0]===t.bodyFont)?.[2]||FONTS[0][2];
  out['--sf-heading-font']=FONTS.find(f=>f[0]===t.headingFont)?.[2]||FONTS[1][2];

@@ -80,3 +80,78 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
 .app-shell[data-selah-theme] .primary:hover{background:var(--sf-button-hover)!important;color:var(--sf-on-button-hover)!important}
 .app-shell[data-selah-theme] .outline{border-color:var(--sf-border)!important;color:var(--sf-text-readable)!important}
 
+
+
+/* v1.3.6: all business-owned UI elements inherit the saved business theme. */
+[data-selah-theme] button,[data-selah-theme] input,[data-selah-theme] select,[data-selah-theme] textarea,[data-selah-theme] label,[data-selah-theme] a,[data-selah-theme] small{font-family:var(--sf-body-font)!important}
+[data-selah-theme] h1,[data-selah-theme] h2,[data-selah-theme] h3,[data-selah-theme] h4,[data-selah-theme] .stat strong,[data-selah-theme] .receipt-total{font-family:var(--sf-heading-font)!important}
+[data-selah-theme] .sf-directions-link{color:inherit!important;text-decoration:underline!important;text-underline-offset:3px;font-weight:650}
+[data-selah-theme] .sf-directions-link:hover{opacity:.8}
+.sf-directions-link{color:var(--brand-primary);text-decoration:underline;text-underline-offset:3px;font-weight:650}
+.sf-address-field{position:relative;width:100%;min-width:0;margin-top:16px}
+.sf-address-field>label{display:block;margin:0 0 8px}
+.sf-address-field>input{width:100%;font-size:16px!important}
+.sf-address-list{position:absolute;left:0;right:0;top:100%;z-index:150;border:1px solid var(--sf-border,#ced5cc);border-radius:9px;max-height:310px;overflow-y:auto;box-shadow:0 12px 28px #14241e24;background:var(--sf-surface,#fff);color:var(--sf-on-surface,#1b3328)}
+.sf-address-option{display:block;width:100%;padding:12px 13px;border:0;border-bottom:1px solid var(--sf-border,#ced5cc);background:var(--sf-surface,#fff);color:var(--sf-on-surface,#1b3328);text-align:left;font-size:13px;line-height:1.45;white-space:normal}
+.sf-address-option:hover,.sf-address-option.active{background:var(--sf-selected,#e9eee7);color:var(--sf-on-selected,#20342c)}
+.sf-address-attribution{padding:8px 13px;font-size:11px;color:var(--sf-on-surface,#333);background:var(--sf-surface,#fff)}
+.sf-address-attribution a{text-decoration:underline}
+.app-shell[data-selah-theme] .topbar{background:var(--sf-surface)!important;color:var(--sf-on-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .topbar .breadcrumb,.app-shell[data-selah-theme] .topbar .breadcrumb b,.app-shell[data-selah-theme] .topbar .breadcrumb span{color:var(--sf-on-surface)!important}
+.app-shell[data-selah-theme] .page-heading h1,.app-shell[data-selah-theme] main>h1{color:var(--sf-heading-on-page)!important}
+.app-shell[data-selah-theme] .page-heading p,.app-shell[data-selah-theme] .eyebrow,.app-shell[data-selah-theme] .main-wrap>main>p{color:var(--sf-text-readable)!important}
+.app-shell[data-selah-theme] .sidebar .studio-switch,.app-shell[data-selah-theme] .sidebar .booking-link{background:var(--sf-header)!important;border:1px solid var(--sf-on-header)!important;color:var(--sf-on-header)!important}
+.app-shell[data-selah-theme] .sidebar .booking-link p,.app-shell[data-selah-theme] .sidebar .nav-label,.app-shell[data-selah-theme] .sidebar .account small,.app-shell[data-selah-theme] .sidebar .studio-switch small{color:var(--sf-on-header)!important}
+.app-shell[data-selah-theme] .sidebar .booking-link .outline,.app-shell[data-selah-theme] .sidebar .booking-link button{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important;border:1px solid var(--sf-border)!important}
+.app-shell[data-selah-theme] .sidebar .nav-item:hover{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important}
+.app-shell[data-selah-theme] .sidebar .account{border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .panel,.app-shell[data-selah-theme] .stat{color:var(--sf-on-surface)!important;background:var(--sf-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .panel h2,.app-shell[data-selah-theme] .panel h3,.app-shell[data-selah-theme] .stat strong,.app-shell[data-selah-theme] .stat span,.app-shell[data-selah-theme] .stat p,.app-shell[data-selah-theme] .panel p,.app-shell[data-selah-theme] .panel small,.app-shell[data-selah-theme] .panel .muted,.app-shell[data-selah-theme] .panel .panel-title p{color:var(--sf-on-surface)!important}
+.app-shell[data-selah-theme] .service-card,.app-shell[data-selah-theme] .client-card,.app-shell[data-selah-theme] .product-tile{background:var(--sf-card)!important;color:var(--sf-on-card)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .service-card h2,.app-shell[data-selah-theme] .service-card p,.app-shell[data-selah-theme] .client-card h3,.app-shell[data-selah-theme] .client-card p,.app-shell[data-selah-theme] .product-tile span,.app-shell[data-selah-theme] .product-tile b{color:var(--sf-on-card)!important}
+.app-shell[data-selah-theme] .tabs,.app-shell[data-selah-theme] .count,.app-shell[data-selah-theme] .weekday>div{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important}
+.app-shell[data-selah-theme] .tabs button{color:var(--sf-on-secondary-button)!important}
+.app-shell[data-selah-theme] .tabs button.active{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important}
+.app-shell[data-selah-theme] .bar,.app-shell[data-selah-theme] .bar-col:nth-child(3n) .bar,.app-shell[data-selah-theme] .weekday i{background:var(--sf-accent)!important}
+.app-shell[data-selah-theme] .booking-modal,.app-shell[data-selah-theme] .chat-panel{background:var(--sf-surface)!important;color:var(--sf-on-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .booking-modal h2,.app-shell[data-selah-theme] .booking-modal h3,.app-shell[data-selah-theme] .modal-body p,.app-shell[data-selah-theme] .modal-header,.app-shell[data-selah-theme] .modal-footer{color:var(--sf-on-surface)!important}
+.app-shell[data-selah-theme] .modal-header,.app-shell[data-selah-theme] .modal-footer{background:var(--sf-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .steps,.app-shell[data-selah-theme] .steps>div{background:var(--sf-step)!important;color:var(--sf-on-step)!important}
+.app-shell[data-selah-theme] .steps>div span{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important}
+.app-shell[data-selah-theme] .steps .current span,.app-shell[data-selah-theme] .steps .done span{background:var(--sf-button)!important;color:var(--sf-on-button)!important}
+.app-shell[data-selah-theme] .booking-service,.app-shell[data-selah-theme] .slot-grid button{background:var(--sf-card)!important;color:var(--sf-on-card)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .booking-service b,.app-shell[data-selah-theme] .booking-service small{color:var(--sf-on-card)!important}
+.app-shell[data-selah-theme] .booking-service.picked,.app-shell[data-selah-theme] .slot-grid .picked{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important;border-color:var(--sf-button)!important}
+.app-shell[data-selah-theme] .booking-service.picked b,.app-shell[data-selah-theme] .booking-service.picked small{color:var(--sf-on-selected)!important}
+.app-shell[data-selah-theme] .booking-summary,.app-shell[data-selah-theme] .reception-card{background:var(--sf-policy)!important;color:var(--sf-on-policy)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .booking-summary p,.app-shell[data-selah-theme] .reception-card h2,.app-shell[data-selah-theme] .reception-card p{color:var(--sf-on-policy)!important}
+.app-shell[data-selah-theme] input:not([type=checkbox]):not([type=color]),.app-shell[data-selah-theme] select,.app-shell[data-selah-theme] textarea{background:var(--sf-input)!important;color:var(--sf-on-input)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] input[type=checkbox]{accent-color:var(--sf-button)}
+.app-shell[data-selah-theme] .outline{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .outline:hover{background:var(--sf-selected)!important;color:var(--sf-on-selected)!important}
+.app-shell[data-selah-theme] .chat-header,.app-shell[data-selah-theme] .chat-input{background:var(--sf-surface)!important;color:var(--sf-on-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .chat-quick button,.app-shell[data-selah-theme] .bot{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .you,.app-shell[data-selah-theme] .chat-fab{background:var(--sf-button)!important;color:var(--sf-on-button)!important;border-color:var(--sf-button)!important}
+.app-shell[data-selah-theme] th{background:var(--sf-step)!important;color:var(--sf-on-step)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] td,.app-shell[data-selah-theme] .person b{color:var(--sf-on-surface)!important;border-color:var(--sf-border)!important}
+.app-shell[data-selah-theme] .sf-editor{background:var(--sf-surface)!important;color:var(--sf-on-surface)!important}
+.app-shell[data-selah-theme] .sf-editor .sf-palette-option{color:var(--sf-on-surface)!important}
+.app-shell[data-selah-theme] .sf-editor .sf-color-grid{background:var(--sf-page)!important}
+.app-shell[data-selah-theme] .sf-editor .sf-color-control{background:var(--sf-card)!important}
+.app-shell[data-selah-theme] .sf-editor .sf-color-control label{color:var(--sf-on-card)!important}
+.app-shell[data-selah-theme] .branding-preview{background:var(--sf-page)!important;color:var(--sf-text-readable)!important}
+.app-shell[data-selah-theme] .branding-preview>div{background:var(--sf-card)!important;color:var(--sf-on-card)!important;border-color:var(--sf-accent)!important}
+.app-shell[data-selah-theme] .branding-preview p,.app-shell[data-selah-theme] .branding-preview h3{color:var(--sf-on-card)!important}
+.app-shell[data-selah-theme] footer:not(.public-footer){color:var(--sf-text-readable)!important}
+.public-page[data-selah-theme] .public-brand b,.public-page[data-selah-theme] .public-brand small{font-family:var(--sf-heading-font)!important;color:var(--sf-on-header)!important}
+.public-page[data-selah-theme] .public-header .logo{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important}
+.public-page[data-selah-theme] .studio-facts small{color:var(--sf-on-hero)!important}
+.public-page[data-selah-theme] .public-form-body .muted,.public-page[data-selah-theme] .booking-success .muted,.public-page[data-selah-theme] .booking-success p,.public-page[data-selah-theme] .modal-footer b,.public-page[data-selah-theme] .modal-footer small{color:var(--sf-on-surface)!important}
+.public-page[data-selah-theme] .steps .current,.public-page[data-selah-theme] .steps .done{color:var(--sf-on-step)!important}
+.public-page[data-selah-theme] .public-booking h2,.public-page[data-selah-theme] .public-booking h3{color:var(--sf-heading-on-surface)!important}
+.public-page[data-selah-theme] .booking-service h3,.public-page[data-selah-theme] .booking-service p{color:var(--sf-on-card)!important}
+.public-page[data-selah-theme] .booking-service.picked h3,.public-page[data-selah-theme] .booking-service.picked p{color:var(--sf-on-selected)!important}
+.public-page[data-selah-theme] .public-intro small,.public-page[data-selah-theme] .studio-facts div{color:var(--sf-on-hero)!important}
+.public-page[data-selah-theme] .public-intro h1{color:var(--sf-heading-on-hero)!important}
+.public-page[data-selah-theme] .public-footer a{color:var(--sf-on-footer)!important}
+

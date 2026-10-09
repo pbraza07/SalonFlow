@@ -31,3 +31,21 @@
 .button{background:var(--brand-primary);color:#fff!important}.button:hover{background:var(--brand-hover)}.button:disabled{opacity:1;background:#DCE2DB;color:#59645D!important}.secondary{border-color:#819487;color:var(--brand-primary);background:white}.secondary:hover{background:var(--brand-selected)}
 .price{color:var(--brand-primary)}.metric{background:var(--brand-selected);color:var(--brand-primary)}.footer{color:var(--brand-muted)}
 .alert{background:#FBE8E7;border-color:#D9948C;color:#8F302A}.success{background:#E3F1E7;border-color:#83AA8C;color:#265E3B}
+
+
+/* v1.3.6: only a signed-in business's private profile uses its selected branding. */
+.businessTheme{background:var(--sf-page)!important;color:var(--sf-text-readable)!important;font-family:var(--sf-body-font)!important}
+.businessTheme h1,.businessTheme h2,.businessTheme h3{font-family:var(--sf-heading-font)!important}
+.businessTheme .hero h1{color:var(--sf-heading-on-page)!important}
+.businessTheme .hero p,.businessTheme .brand,.businessTheme .nav a{color:var(--sf-text-readable)!important}
+.businessTheme .card{background:var(--sf-surface)!important;color:var(--sf-on-surface)!important;border-color:var(--sf-border)!important}
+.businessTheme .card p,.businessTheme .card small,.businessTheme .card h2,.businessTheme .card label{color:var(--sf-on-surface)!important}
+.businessTheme .card a:not(.button):not(.secondary){color:var(--sf-link-on-surface)!important}
+.businessTheme .card input,.businessTheme .card select,.businessTheme .card textarea{background:var(--sf-input)!important;color:var(--sf-on-input)!important;border-color:var(--sf-border)!important;font-family:var(--sf-body-font)!important}
+.businessTheme .button{background:var(--sf-button)!important;color:var(--sf-on-button)!important;font-family:var(--sf-body-font)!important}
+.businessTheme .button:hover{background:var(--sf-button-hover)!important;color:var(--sf-on-button-hover)!important}
+.businessTheme .secondary{background:var(--sf-secondary-button)!important;color:var(--sf-on-secondary-button)!important;border-color:var(--sf-border)!important;font-family:var(--sf-body-font)!important}
+.businessTheme .sf-address-field .sf-address-list{background:var(--sf-surface);color:var(--sf-on-surface)}
+.businessTheme .sf-address-field .sf-address-option{background:var(--sf-surface);color:var(--sf-on-surface)}
+.businessTheme .sf-address-field .sf-address-option:hover,.businessTheme .sf-address-field .sf-address-option.active{background:var(--sf-selected);color:var(--sf-on-selected)}
+
