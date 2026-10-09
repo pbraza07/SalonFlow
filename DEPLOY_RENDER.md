@@ -1,3 +1,7 @@
+# SelahFlow v1.3.2
+
+Deploy the main branch to the existing Render service at https://salonflow-hf3w.onrender.com. Preserve the existing DATABASE_URL, administrator credentials and PostgreSQL database. No new migrations are needed. After the build, check /api/health, /, /crawford, /studio/crawford, and /book/crawford.
+
 # Deploy SelahFlow version 1.3.1 with GitHub + Render
 
 ## 1. Extract and upload to GitHub

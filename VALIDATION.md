@@ -1,3 +1,7 @@
+# SelahFlow v1.3.2 route validation
+
+Run npm ci, npm run typecheck, npm test and npm run build. Confirm Crawford existing appointments, services, team and account persist.
+
 # Version 1 validation
 
 Verified in the build environment on October 8, 2026:

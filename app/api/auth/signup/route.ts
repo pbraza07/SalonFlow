@@ -2,6 +2,7 @@ import {randomBytes,randomUUID} from 'node:crypto';
 import {getPool} from '../../../../server/database.mjs';
 import {hashPassword,tokenHash,validOrigin,cookie} from '../../../../server/security.mjs';
 import {defaultSettings} from '../../../../lib/defaults';
+import {isReservedBusinessSlug,dashboardPath,businessPath,bookingPath} from '../../../../server/route-slugs.mjs';
 export const runtime='nodejs';
 const industries=new Set(['barber','hair','nails','pet-grooming','spa','massage','fitness','tutoring','cleaning','auto-detailing','custom']);
 export async function POST(req:Request){
@@ -16,7 +17,7 @@ export async function POST(req:Request){
   const slug=String(b.slug||'').trim().toLowerCase();
   const industry=String(b.industry||'custom');
   const password=b.password;
-  if(slug==='crawford')return Response.json({error:'This booking URL is reserved for the original business.'},{status:409});
+  if(isReservedBusinessSlug(slug))return Response.json({error:'This booking URL is reserved for the original business.'},{status:409});
   if(!/^\S+@\S+\.\S+$/.test(email)||email.length>254||
     typeof password!=='string'||password.length<12||password.length>256||
     name.length<2||name.length>100||!industries.has(industry)||
@@ -43,6 +44,6 @@ export async function POST(req:Request){
    if((error as {code?:string}).code==='23505')return Response.json({error:'This email or booking URL is already registered.'},{status:409});
    throw error;
   }finally{client.release();}
-  return Response.json({ok:true,slug,bookingUrl:'/book/'+slug},{status:201,headers:{'Set-Cookie':cookie(session),'Cache-Control':'no-store'}});
+  return Response.json({ok:true,slug,bookingUrl:bookingPath(slug),dashboardUrl:dashboardPath(slug),businessUrl:businessPath(slug)},{status:201,headers:{'Set-Cookie':cookie(session),'Cache-Control':'no-store'}});
  }catch(error){console.error('Business registration failed',error);return Response.json({error:'Registration is temporarily unavailable.'},{status:503});}
 }
