@@ -17,8 +17,8 @@ export async function POST(req:Request){
  try{
   const owner=await requireOwner(req),b=await req.json();
   const name=String(b.name||'').trim(),description=String(b.description||'').trim(),city=String(b.city||'').trim(),region=String(b.region||'').trim();
-  const brandPrimary=String(b.brandPrimary||'#123F3A'),brandBackground=String(b.brandBackground||'#F7F4EC'),businessModel=String(b.businessModel||'').trim();
-  if(name.length<2||name.length>100||description.length>600||city.length>80||region.length>80||businessModel.length>2000||!/^#[0-9a-fA-F]{6}$/.test(brandPrimary)||!/^#[0-9a-fA-F]{6}$/.test(brandBackground)||typeof b.requestListing!=='boolean')
+  const brandPrimary=b.brandPrimary===undefined?null:String(b.brandPrimary),brandBackground=b.brandBackground===undefined?null:String(b.brandBackground),businessModel=b.businessModel===undefined?null:String(b.businessModel).trim();
+  if(name.length<2||name.length>100||description.length>600||city.length>80||region.length>80||(businessModel!==null&&businessModel.length>2000)||(brandPrimary!==null&&!/^#[0-9a-fA-F]{6}$/.test(brandPrimary))||(brandBackground!==null&&!/^#[0-9a-fA-F]{6}$/.test(brandBackground))||typeof b.requestListing!=='boolean')
    return Response.json({error:'Check business profile information.'},{status:400});
   const pool=getPool(),client=await pool.connect();
   try{
@@ -29,7 +29,7 @@ export async function POST(req:Request){
    const settings=settingsRow?JSON.parse(settingsRow.data):null;
    if(b.requestListing&&(!settings?.services?.length||!settings?.staff?.length))
     {await client.query('ROLLBACK');return Response.json({error:'Add at least one service and team member before requesting a listing.'},{status:400});}
-   await client.query('UPDATE businesses SET name=$1,description=$2,city=$3,region=$4,listing_requested=CASE WHEN $5 THEN TRUE ELSE listing_requested END,brand_primary=$7,brand_background=$8,business_model=$9,updated_at=now() WHERE owner_id=$6',[name,description,city,region,b.requestListing,owner,brandPrimary,brandBackground,businessModel]);
+   await client.query('UPDATE businesses SET name=$1,description=$2,city=$3,region=$4,listing_requested=CASE WHEN $5 THEN TRUE ELSE listing_requested END,brand_primary=COALESCE($7,brand_primary),brand_background=COALESCE($8,brand_background),business_model=COALESCE($9,business_model),updated_at=now() WHERE owner_id=$6',[name,description,city,region,b.requestListing,owner,brandPrimary,brandBackground,businessModel]);
    if(settings){settings.name=name;await client.query('UPDATE settings SET data=$1 WHERE owner=$2',[JSON.stringify(settings),owner]);}
    await client.query('COMMIT');
    return Response.json({ok:true,listingPending:!!b.requestListing},{headers:noStore});
