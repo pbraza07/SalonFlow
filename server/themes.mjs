@@ -36,7 +36,7 @@ export function resolveTheme(input,primary='#123F3A',background='#F7F4EC'){
 }
 function lum(h){const a=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(x=>x<=0.04045?x/12.92:((x+.055)/1.055)**2.4);return a[0]*.2126+a[1]*.7152+a[2]*.0722;}
 export function contrast(a,b){const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
-export function accessibleText(bg,pref='#183330'){if(HEX.test(pref)&&contrast(bg,pref)>=4.5)return pref;return contrast(bg,'#17292D')>=contrast(bg,'#FFFFFF')?'#17292D':'#FFFFFF';}
+export function accessibleText(bg,pref='#183330'){if(HEX.test(pref)&&contrast(bg,pref)>=4.5)return pref;return contrast(bg,'#000000')>=contrast(bg,'#FFFFFF')?'#000000':'#FFFFFF';}
 export function themeStyles(raw,primary,background){
  const t=resolveTheme(raw,primary,background),c=t.colors,out={};
  for(const [id] of COLOR_ROLES)out['--sf-'+id.replace(/[A-Z]/g,x=>'-'+x.toLowerCase())]=c[id];
