@@ -1,4 +1,4 @@
-# SalonFlow v1.3 platform roadmap — October 8, 2026
+# SelahFlow v1.3 platform roadmap — October 8, 2026
 
 ## Scope and release truth
 Version 1.3 is a **development foundation**, not a Fresha-equivalent production release. The earlier 1.2 owner studio and public /book flow are preserved. Do not deploy the branch to a public production service until the registration and authorization checks below pass with a PostgreSQL backup. Do not charge marketplace fees, switch on paid checkout, or claim generative AI or SMS/voice access is working.

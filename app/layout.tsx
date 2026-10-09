@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SalonFlow | Hair & Barber Studio",
-  description: "Your studio, beautifully in sync. Booking, calendar, clients and front desk.",
+  title: "SelahFlow | Smart booking & AI receptionist.",
+  description: "Your bookings flow. You breathe. Smart booking & AI receptionist.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

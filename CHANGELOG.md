@@ -1,3 +1,10 @@
+# SelahFlow release history
+
+## Version 1.4 — Branding only — 2026-10-09
+- Applied Pause & Flow logos, deep teal/sage/ivory/gold palette and platform display name.
+- Preserved v1.3 application behavior, database/migrations, business identities, Crawford routes, authentication, permissions and deployment settings.
+- Technical SalonFlow identifiers remain unchanged for compatibility.
+
 ## Version 1.3 (development branch) — 2026-10-08
 - Added additive multi-business schema, customer-facing signup, per-business booking slugs, platform admin role, business profile editor, discovery marketplace and listing approval.
 - Preserved original /book, owner data and existing calendar/checkout; owner dashboard now resolves its branded booking URL.
@@ -31,6 +38,6 @@
 
 ## Version convention
 User-facing releases: 1, 1.1, 1.2, 1.3, …
-ZIP filenames: SalonFlow_Studio_v1.zip, SalonFlow_Studio_v1.1.zip, …
+ZIP filenames: SelahFlow_Studio_v1.zip, SelahFlow_Studio_v1.1.zip, …
 The package.json machine version for version 1 is 1.0.0; version 1.1 uses 1.1.0.
 Do not create an empty new version without actual changes.

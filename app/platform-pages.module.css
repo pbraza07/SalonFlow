@@ -21,3 +21,13 @@
 .gridMetric{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .metric{background:#21364c;border-radius:12px;padding:17px}.metric strong{display:block;font-size:29px;margin-top:7px}
 .footer{color:#9bafc0;margin:40px 0 10px;font-size:13px}
+
+/* SelahFlow branding: structure and component behavior preserved. */
+.shell{background:var(--brand-background);color:var(--brand-ink)}
+.brand{color:var(--brand-primary);display:flex;align-items:center;gap:12px;flex-wrap:wrap}.nav a{color:var(--brand-primary)}
+.hero h1{color:var(--brand-primary)}.hero p{color:var(--brand-muted)}
+.card{background:var(--brand-surface);border-color:var(--brand-border);box-shadow:0 10px 35px #123f3a0a}.card h2{color:var(--brand-primary)}.card p,.card small{color:var(--brand-muted)}.card label{color:var(--brand-ink)}
+.card input,.card select,.card textarea,.filter input,.filter select{background:white;color:var(--brand-ink);border-color:#819487}.card input:focus,.card select:focus,.card textarea:focus{outline-color:var(--brand-primary)}
+.button{background:var(--brand-primary);color:#fff!important}.button:hover{background:var(--brand-hover)}.button:disabled{opacity:1;background:#DCE2DB;color:#59645D!important}.secondary{border-color:#819487;color:var(--brand-primary);background:white}.secondary:hover{background:var(--brand-selected)}
+.price{color:var(--brand-primary)}.metric{background:var(--brand-selected);color:var(--brand-primary)}.footer{color:var(--brand-muted)}
+.alert{background:#FBE8E7;border-color:#D9948C;color:#8F302A}.success{background:#E3F1E7;border-color:#83AA8C;color:#265E3B}

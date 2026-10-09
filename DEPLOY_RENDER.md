@@ -1,7 +1,7 @@
-# Deploy SalonFlow version 1.2 with GitHub + Render
+# Deploy SelahFlow version 1.2 with GitHub + Render
 
 ## 1. Extract and upload to GitHub
-1. Download `SalonFlow_Studio_v1.2.zip` and extract it.
+1. Download `SelahFlow_Studio_v1.2.zip` and extract it.
 2. Open the extracted `salonflow-v1.2` folder. It contains `package.json`, `package-lock.json`, `render.yaml`, `app`, `server`, and the other source files.
 3. In GitHub, create a **private repository**, for example `salonflow-studio`.
 4. Upload the **contents** of `salonflow-v1.2` into the repository root, not the enclosing folder. `package.json` and `render.yaml` must be visible immediately when opening the repository.
@@ -12,7 +12,7 @@ For Git command-line users, run these inside the extracted folder, replacing YOU
 ```bash
 git init
 git add .
-git commit -m "SalonFlow version 1.2"
+git commit -m "SelahFlow version 1.2"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/salonflow-studio.git
 git push -u origin main
