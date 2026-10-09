@@ -1,3 +1,11 @@
+## Version 1.3 (development branch) — 2026-10-08
+- Added additive multi-business schema, customer-facing signup, per-business booking slugs, platform admin role, business profile editor, discovery marketplace and listing approval.
+- Preserved original /book, owner data and existing calendar/checkout; owner dashboard now resolves its branded booking URL.
+- Protected the platform administrator during startup migrations instead of rewriting the oldest owner indiscriminately.
+- Added a static proposed price catalog, referral fee calculation and storage tables. Paid checkout, Connect merchant payments, fee assessment, AI, SMS and voice are NOT implemented or live.
+- Added platform foundation tests, CI workflow and phased development roadmap in docs/RELEASE_v1.3_ROADMAP.md.
+- Requires backup and staging validation. Public self-registration must undergo further email verification, security and abuse testing before unrestricted commercial launch.
+
 # Release history
 
 ## Version 1.2 — 2026-10-08
