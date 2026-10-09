@@ -13,12 +13,25 @@ try{
   await client.query(await readFile(new URL('../migrations/'+file,import.meta.url),'utf8'));
   await client.query('INSERT INTO schema_migrations(version) VALUES($1)',[file]);
  }
- const existing=(await client.query('SELECT id,email,password_hash FROM users ORDER BY created_at LIMIT 1')).rows[0];
+ // Preserve the original platform admin account after public owner registration begins.
+ const existing=(await client.query('SELECT users.id,users.email,users.password_hash FROM platform_admins JOIN users ON users.id=platform_admins.user_id LIMIT 1')).rows[0]||(await client.query('SELECT id,email,password_hash FROM users ORDER BY created_at LIMIT 1')).rows[0];
  if(!existing){await client.query('INSERT INTO users(id,email,password_hash) VALUES($1,$2,$3)',[randomUUID(),email,hashPassword(password)]);}
  else if(existing.email!==email||!verifyPassword(password,existing.password_hash)){
   await client.query('UPDATE users SET email=$1,password_hash=$2 WHERE id=$3',[email,hashPassword(password),existing.id]);
   await client.query('DELETE FROM sessions WHERE user_id=$1',[existing.id]);
  }
+ // Backfill the original studio. New owners receive these rows atomically at signup.
+ const admin=(await client.query('SELECT id FROM users WHERE email=$1',[email])).rows[0];
+ if(!admin)throw Error('Platform admin could not be identified.');
+ await client.query('INSERT INTO platform_admins(user_id) VALUES($1) ON CONFLICT DO NOTHING',[admin.id]);
+ const priorSettings=(await client.query('SELECT data FROM settings WHERE owner=$1',[admin.id])).rows[0];
+ let studioName='SalonFlow Studio';
+ try{studioName=JSON.parse(priorSettings?.data||'{}').name||studioName;}catch{}
+ const slug='salonflow-'+admin.id.replace(/-/g,'').slice(0,12);
+ await client.query('INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES($1,$2,$3,$4,$5) ON CONFLICT(owner_id) DO NOTHING',[randomUUID(),admin.id,slug,studioName,'barber']);
+ const business=(await client.query('SELECT id FROM businesses WHERE owner_id=$1',[admin.id])).rows[0];
+ await client.query("INSERT INTO business_memberships(business_id,user_id,role) VALUES($1,$2,'owner') ON CONFLICT DO NOTHING",[business.id,admin.id]);
+ await client.query("INSERT INTO business_subscriptions(business_id,plan_code,status) VALUES($1,'free','active') ON CONFLICT DO NOTHING",[business.id]);
  await client.query('DELETE FROM sessions WHERE expires_at<=now()');
  await client.query("DELETE FROM login_attempts WHERE window_start<now()-interval '1 day'");
  await client.query("DELETE FROM public_limits WHERE window_start<now()-interval '1 day'");
