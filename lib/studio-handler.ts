@@ -13,7 +13,7 @@ if(b.action==='settings'){const c=b.config;
  const plan=await db().prepare('SELECT s.plan_code,s.status FROM business_subscriptions s JOIN businesses b ON b.id=s.business_id WHERE b.owner_id=?').bind(owner).first<{plan_code:string;status:string}>();
  const cap=plan?.status==='active'?({free:1,professional:3,business:10} as Record<string,number>)[plan.plan_code]||1:1;
  const oldTeam=Array.isArray(config.staff)?config.staff:[];
- if(c.staff.length>cap&&c.staff.length>oldTeam.length)throw Error('Team member limit reached for your subscription. Existing members remain; upgrade before adding another.');
+ if(c.staff.length>cap&&c.staff.some((member:any)=>!oldTeam.some((previous:any)=>previous.id===member.id)))throw Error('Team member limit reached for your subscription. Existing members remain; upgrade before adding another.');
  if(new Set(c.staff.map((p:any)=>p.id)).size!==c.staff.length||new Set(c.services.map((p:any)=>p.id)).size!==c.services.length)throw Error('Duplicate service or team IDs.');
  if(!c.staff.every((p:any)=>typeof p.id==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(p.id)&&typeof p.name==='string'&&p.name.trim()&&p.name.length<=100&&typeof p.role==='string'&&p.role.length<=100&&Array.isArray(p.services)&&p.services.every((id:any)=>c.services.some((v:any)=>v.id===id))))throw Error('Check team members and assigned services.');
  if(!c.services.every((p:any)=>typeof p.id==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(p.id)&&typeof p.name==='string'&&p.name.trim()&&p.name.length<=100&&typeof p.category==='string'&&p.category.trim()&&p.category.length<=60))throw Error('Check service types and names.');
