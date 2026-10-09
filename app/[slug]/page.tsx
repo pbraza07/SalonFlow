@@ -9,7 +9,7 @@ import {themeStyles} from '../../server/themes.mjs';
 import {durationLabel,isTermUnit} from '../../lib/service-terms';
 import {googleMapsDirections,displayBusinessAddress} from '../../lib/maps';
 export const dynamic='force-dynamic';
-type Service={id:string;name:string;duration:number;price:number;description?:string};
+type Service={id:string;name:string;duration:number;durationUnit?:string;durationValue?:number;price:number;description?:string};
 type Row={name:string;slug:string;industry:string;description:string;city:string;region:string;data:string|null;brand_primary:string;brand_background:string;business_model:string;has_logo:boolean};
 export default async function BusinessPage({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params;
