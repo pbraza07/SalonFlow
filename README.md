@@ -1,3 +1,9 @@
+# SelahFlow v1.3.3 — Owner Controls
+
+New business-specific colors, logo uploads, descriptions, service catalog + team editors, server-enforced team subscription caps, self-service password changes, and primary administrator invitations. The original Crawford data remains intact. The primary administrator email is pbraza@gmail.com; passwords are not embedded in source, and new passwords must be at least 12 characters. Paid subscription activation is not implemented.
+
+See [v1.3.3 guide](docs/RELEASE_v1.3.3_OWNER_CONTROLS.md).
+
 # SelahFlow Studio v1.3.2 — Platform and per-business routing
 
 Main platform: https://salonflow-hf3w.onrender.com/

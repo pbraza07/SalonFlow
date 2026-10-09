@@ -4,7 +4,7 @@ const moduleURL=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base6
 test('public booking creates protected owner records; exposes catalog only; rejects conflicts and stale quotes',async()=>{
  const pg=new PGlite();const old=process.env.APP_URL;process.env.APP_URL='https://studio.example';
  try{
- for(const file of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql'])await pg.exec(await readFile(new URL('../migrations/'+file,import.meta.url),'utf8'));
+ for(const file of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql','004_business_customization.sql'])await pg.exec(await readFile(new URL('../migrations/'+file,import.meta.url),'utf8'));
  await pg.query("INSERT INTO users(id,email,password_hash) VALUES('owner','private@example.com','secret-hash')");
  await pg.query("INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES('crawford-biz','owner','crawford','Crawford','barber')");
  let queue=Promise.resolve();const pool={async connect(){const prev=queue;let release;queue=new Promise(r=>release=r);await prev;return {query:(s,v)=>pg.query(s,v),release};}};

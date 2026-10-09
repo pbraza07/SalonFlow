@@ -1,12 +1,13 @@
 import {getPool} from '../../../../server/database.mjs';
 import {requireOwner} from '../../../../lib/auth';
 import {validOrigin} from '../../../../server/security.mjs';
+import {getPlatformRole} from '../../../../server/platform-roles.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 async function platformOwner(req:Request){
  const owner=await requireOwner(req);
- const admin=(await getPool().query('SELECT 1 FROM platform_admins WHERE user_id=$1',[owner])).rowCount;
- if(!admin)throw Error('FORBIDDEN');
+ const role=await getPlatformRole(getPool(),owner);
+ if(!role)throw Error('FORBIDDEN');
  return owner;
 }
 const err=(e:unknown)=>Response.json({error:(e as Error).message==='AUTH_REQUIRED'?'Please sign in.':(e as Error).message==='FORBIDDEN'?'Platform administrators only.':'Operation unavailable.'},{status:(e as Error).message==='AUTH_REQUIRED'?401:(e as Error).message==='FORBIDDEN'?403:503});
