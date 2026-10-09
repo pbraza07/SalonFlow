@@ -14,7 +14,7 @@ export function normalizePhotonFeature(feature){
 export function normalizePhotonResults(input){
  if(!Array.isArray(input?.features))return [];
  const seen=new Set(),results=[];
- for(const feature of input.features.slice(0,12)){
+ for(const feature of input.features.slice(0,40)){
   const value=normalizePhotonFeature(feature);
   if(!value||seen.has(value.label.toLowerCase()))continue;
   seen.add(value.label.toLowerCase());results.push(value);
