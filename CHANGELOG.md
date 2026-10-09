@@ -1,3 +1,11 @@
+## Version 1.3.5 — Business-wide palette and typography customization — 2026-10-09
+- 20 coordinated color palettes and 12 font choices with separate heading/body typography.
+- 19 editable HEX color roles covering booking header, page, cards, policy, forms, steps, selections, buttons, links, and footer.
+- Browser and server validate saved themes; automatically choose readable text colors for contrasting backgrounds.
+- Applied themes to individual owners' workspaces, public business profiles and customer booking pages.
+- Theme saved per owner in the existing PostgreSQL settings record (no new migration or database reset).
+- Existing logos, service/staff catalog, passwords and v1.3.4 six-character password policy preserved.
+
 ## Version 1.3.4 — October 9, 2026
 - Unified six-character minimum for new owner passwords, password changes, administrator invites, sign-in and startup.
 - Matched server validation, browser form limits, user-visible messages and tests.
