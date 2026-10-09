@@ -21,6 +21,18 @@ test('v1.3 migration is additive and business owner scope is isolated',async()=>
   assert.equal((await pg.query("SELECT COUNT(*)::int AS count FROM appointments")).rows[0].count,0);
  }finally{await pg.close();}
 });
+test('reserved Crawford original business retains existing appointments and cannot be re-registered',async()=>{
+ const pg=new PGlite();
+ try{
+  for(const name of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql'])await pg.exec(await readFile(new URL(name,url),'utf8'));
+  await pg.query("INSERT INTO users(id,email,password_hash) VALUES('original','original@example.test','x'),('new','new@example.test','x')");
+  await pg.query("INSERT INTO appointments(id,owner,date,staff,start,duration,data,status) VALUES('old-booking','original','2026-12-01','ava',540,60,'{}','Confirmed')");
+  await pg.query("INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES('first','original','crawford','Crawford','barber')");
+  await assert.rejects(pg.query("INSERT INTO businesses(id,owner_id,slug,name) VALUES('second','new','crawford','Copy')"));
+  assert.equal((await pg.query("SELECT owner FROM appointments WHERE id='old-booking'")).rows[0].owner,'original');
+  assert.equal((await pg.query("SELECT owner_id FROM businesses WHERE slug='crawford'")).rows[0].owner_id,'original');
+ }finally{await pg.close();}
+});
 test('v1.3 proposed plans and commission math reject invalid values',async()=>{
  const source=await readFile(new URL('../lib/plans.ts',import.meta.url),'utf8');
  const output=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText;
