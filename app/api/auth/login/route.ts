@@ -9,7 +9,7 @@ export async function POST(req:Request){
  try{
   if(Number(req.headers.get('content-length'))>4096)return Response.json({error:'Request too large.'},{status:413});
   const {email,password}=await req.json();
-  if(typeof email!=='string'||typeof password!=='string'||email.length>254||password.length>256)return Response.json({error:'Enter a valid email and password.'},{status:400});
+  if(typeof email!=='string'||typeof password!=='string'||email.length>254||password.length<6||password.length>256)return Response.json({error:'Enter a valid email and password.'},{status:400});
   const key=tokenHash(email.trim().toLowerCase());const pool=getPool();
   const rate=await pool.query("INSERT INTO login_attempts(key,count,window_start) VALUES($1,1,now()) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END, window_start=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN now() ELSE login_attempts.window_start END RETURNING count",[key]);
   if(rate.rows[0].count>10)return Response.json({error:'Too many attempts. Please wait 15 minutes.'},{status:429});
