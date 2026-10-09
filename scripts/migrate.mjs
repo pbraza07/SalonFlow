@@ -15,7 +15,7 @@ try{
   await client.query('INSERT INTO schema_migrations(version) VALUES($1)',[file]);
  }
  // Preserve the original platform admin account after public owner registration begins.
- const existing=(await client.query('SELECT users.id,users.email,users.password_hash FROM platform_admins JOIN users ON users.id=platform_admins.user_id LIMIT 1')).rows[0]||(await client.query('SELECT id,email,password_hash FROM users ORDER BY created_at LIMIT 1')).rows[0];
+ const existing=(await client.query("SELECT users.id,users.email,users.password_hash FROM businesses JOIN users ON users.id=businesses.owner_id WHERE businesses.slug='crawford' LIMIT 1")).rows[0]||(await client.query("SELECT users.id,users.email,users.password_hash FROM platform_admins p JOIN users ON users.id=p.user_id ORDER BY CASE WHEN p.role='primary' THEN 0 ELSE 1 END,users.created_at,users.id LIMIT 1")).rows[0]||(await client.query('SELECT id,email,password_hash FROM users ORDER BY created_at,id LIMIT 1')).rows[0];
  if(!existing){await client.query('INSERT INTO users(id,email,password_hash) VALUES($1,$2,$3)',[randomUUID(),email,hashPassword(password)]);}
  else if(existing.email!==email){console.warn('ADMIN_EMAIL differs from original owner. Preserving original credentials and owner identity.');}
  // Backfill the original studio. New owners receive these rows atomically at signup.
