@@ -31,7 +31,7 @@ try{
  const conflicting=(await client.query('SELECT owner_id FROM businesses WHERE slug=$1 AND owner_id<>$2',[slug,admin.id])).rows[0];
  if(conflicting)throw Error('Crawford slug conflict; migration stopped without modifying business data.');
  await client.query('UPDATE businesses SET slug=$1,updated_at=now() WHERE owner_id=$2 AND slug<>$1',[slug,admin.id]);
- await client.query('INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES($1,$2,$3,$4,$5) ON CONFLICT(owner_id) DO NOTHING',[randomUUID(),admin.id,slug,studioName,'barber']);
+ await client.query("INSERT INTO businesses(id,owner_id,slug,name,industry,created_at) SELECT $1,$2,$3,$4,$5,users.created_at FROM users WHERE users.id=$2 ON CONFLICT(owner_id) DO NOTHING",[randomUUID(),admin.id,slug,studioName,"barber"]);
  const business=(await client.query('SELECT id FROM businesses WHERE owner_id=$1',[admin.id])).rows[0];
  await client.query("INSERT INTO business_memberships(business_id,user_id,role) VALUES($1,$2,'owner') ON CONFLICT DO NOTHING",[business.id,admin.id]);
  await client.query("INSERT INTO business_subscriptions(business_id,plan_code,status) VALUES($1,'free','active') ON CONFLICT DO NOTHING",[business.id]);
