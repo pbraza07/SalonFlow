@@ -19,7 +19,7 @@ test('owner dashboard requires session and enforces slug',async()=>{
  assert.match(source,/if\(actualSlug!==slug\)redirect/);
  const signup=await read('app/api/auth/signup/route.ts');
  assert.match(signup,/isReservedBusinessSlug\(slug\)/);
- assert.match(signup,/dashboardUrl:dashboardPath\(slug\)/);
+ assert.match(signup,/dashboardUrl:'\/registration-status'/);
  const login=await read('app/api/auth/login/route.ts');
  assert.match(login,/dashboardUrl:target/);
 });
@@ -27,5 +27,5 @@ test('original Crawford migration remains unchanged',async()=>{
  const source=await read('scripts/migrate.mjs');
  assert.match(source,/const slug='crawford'/);
  const health=await read('app/api/health/route.ts');
- assert.match(health,/version:'1.3.6'/);
+ assert.match(health,/version:'1.3.7'/);
 });

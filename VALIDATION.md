@@ -1,3 +1,15 @@
+# v1.3.7 Acceptance tests
+
+- New signup creates a pending business; owner is sent to /registration-status, private studio APIs return blocked and public /book/{slug} is inaccessible.
+- Primary administrator pbraza@gmail.com sees all pending businesses in /admin/platform, can approve or decline. Other platform administrators cannot perform registration approvals.
+- Approval sets status active AND is_listed true automatically. The business immediately appears in /discover and can sign in to its private dashboard.
+- Declined business is not listed or bookable; old Crawford and approved businesses are unchanged.
+- Signup industry categories and marketplace filters are consistent; state select includes all 50 states and DC.
+- Service durations cover minutes/hours/days/weeks/months/years; hourly appointment slots never span multiple days.
+- Manually enroll a client in monthly and yearly plans, verify owner counts and platform admin counts, mark an enrollment complete/cancelled and verify counts update.
+- Existing appointment bookings remain valid and the 6-character password policy is unchanged.
+- Run npm ci, npm run typecheck, npm test, npm run build; inspect Render migrations and /api/health 1.3.7.
+
 # v1.3.5 acceptance
 - Run npm ci, npm run typecheck, npm test, npm run build.
 - Verify all 20 palettes and 12 font types appear in Branding.

@@ -1,3 +1,15 @@
+## v1.3.7 — Business approval, duration units and service-term tracking — October 9, 2026
+
+- New business registrations enter 'pending'; primary platform administrator approves/declines from the protected dashboard.
+- Approval activates the owner dashboard, public booking and marketplace listing in one server-side update. Declined accounts are not publicly listed.
+- Existing active Crawford and other historical businesses retain their status, appointments and data.
+- Registration and marketplace dropdowns offer broad categories across beauty, health, education, trades, professional services, events and others.
+- State dropdowns for all 50 U.S. states plus Washington, DC in signup, Business Profile and owner Settings.
+- Services offer duration units minutes, hours, days, weeks, months and years. Minutes/hours book slots as before; longer services are recorded as term enrollments.
+- Owners can record and complete/cancel client enrollments. Monthly and annual active enrollment counts are visible on owner and platform administrator dashboards; no subscription charges or renewals are automated.
+- PostgreSQL migration 005 adds pending/rejected business statuses and owner-scoped service_enrollments, without modifying existing appointments.
+- The 6-character minimum password policy remains unchanged.
+
 ## v1.3.6 — Consistent business branding, address autocomplete & Google Maps — 2026-10-09
 - Applied every business theme to every dedicated business screen: owner dashboard pages, dashboard dialogs, public booking, public business profile, and private Business Profile editor.
 - Fixed text/background contrast and font propagation in previously hardcoded dashboard, booking, and service card sections; semantic success/error messages remain distinguishable.

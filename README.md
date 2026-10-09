@@ -1,3 +1,11 @@
+# SelahFlow Studio v1.3.7 — All business registrations require approval
+
+The **primary administrator** approves every new application in /admin/platform. New signups are `pending` and redirected to /registration-status. They cannot use private studio APIs or public booking until approved. Approval atomically makes the business `active` and `is_listed=true` so it appears in /discover automatically.
+
+Signup supports broad service-industry categories plus 50-state dropdowns (and DC). Owner Settings supports minute/hour appointment service durations and separately tracked day/week/month/year services. Monthly and annual service enrollments, their start/renewal dates and statuses are visible to business owners and as aggregated counts to platform administrators. Term-service tracking is manual; Stripe recurring charges are still not active.
+
+Full rollout and architecture: docs/RELEASE_v1.3.7_APPROVAL_AND_TERMS.md
+
 # SelahFlow v1.3.6 — Business-wide themes and addresses
 
 **Current release: 1.3.6.** Independent saved business themes apply to all owner dashboard views, dialogs, business profile, public business homepage, and booking screens. No changes to platform administration or shared SelahFlow branding.

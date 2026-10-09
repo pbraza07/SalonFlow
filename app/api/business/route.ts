@@ -9,7 +9,7 @@ const noStore={'Cache-Control':'no-store'};
 export async function GET(req:Request){
  try{
   const owner=await requireOwner(req);
-  const row=(await getPool().query('SELECT b.id,b.slug,b.name,b.industry,b.description,b.city,b.region,b.is_listed,b.listing_requested,b.brand_primary,b.brand_background,b.business_model,EXISTS(SELECT 1 FROM business_logos l WHERE l.business_id=b.id) AS has_logo,s.plan_code,s.ai_addon,st.data AS studio_settings FROM businesses b JOIN business_subscriptions s ON s.business_id=b.id LEFT JOIN settings st ON st.owner=b.owner_id WHERE b.owner_id=$1',[owner])).rows[0];
+  const row=(await getPool().query('SELECT b.id,b.slug,b.name,b.industry,b.description,b.city,b.region,b.status,b.is_listed,b.listing_requested,b.brand_primary,b.brand_background,b.business_model,EXISTS(SELECT 1 FROM business_logos l WHERE l.business_id=b.id) AS has_logo,s.plan_code,s.ai_addon,st.data AS studio_settings FROM businesses b JOIN business_subscriptions s ON s.business_id=b.id LEFT JOIN settings st ON st.owner=b.owner_id WHERE b.owner_id=$1',[owner])).rows[0];
   return Response.json({business:row?{...row,studio_settings:undefined,theme:(()=>{try{return JSON.parse(row.studio_settings||'{}').theme||null;}catch{return null;}})(),address:(()=>{try{return JSON.parse(row.studio_settings||'{}').address||'';}catch{return '';}})(),teamLimit:PLANS[row.plan_code as keyof typeof PLANS]?.bookableStaff??1}:null},{headers:noStore});
  }catch(e){return Response.json({error:(e as Error).message==='AUTH_REQUIRED'?'Please sign in.':'Unavailable.'},{status:(e as Error).message==='AUTH_REQUIRED'?401:503});}
 }
@@ -27,8 +27,8 @@ export async function POST(req:Request){
   const pool=getPool(),client=await pool.connect();
   try{
    await client.query('BEGIN');
-   const record=(await client.query('SELECT id FROM businesses WHERE owner_id=$1 FOR UPDATE',[owner])).rows[0];
-   if(!record){await client.query('ROLLBACK');return Response.json({error:'Business not found.'},{status:404});}
+   const record=(await client.query('SELECT id,status FROM businesses WHERE owner_id=$1 FOR UPDATE',[owner])).rows[0];
+   if(!record){await client.query('ROLLBACK');return Response.json({error:'Business not found.'},{status:404});}if(record.status!=='active'){await client.query('ROLLBACK');return Response.json({error:'Business awaiting platform approval.'},{status:403});}
    const settingsRow=(await client.query('SELECT data FROM settings WHERE owner=$1 FOR UPDATE',[owner])).rows[0];
    const settings=settingsRow?JSON.parse(settingsRow.data):null;
    if(b.requestListing&&(!settings?.services?.length||!settings?.staff?.length))
