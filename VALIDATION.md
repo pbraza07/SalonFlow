@@ -1,3 +1,11 @@
+# v1.3.5 acceptance
+- Run npm ci, npm run typecheck, npm test, npm run build.
+- Verify all 20 palettes and 12 font types appear in Branding.
+- Select a preset, customize buttons/header/service card/booking steps/inputs/footer, and Save & publish. Reload /book/crawford and /crawford.
+- Check readable text on light/dark colors and narrow mobile screen, including all booking steps.
+- Verify custom colors remain after reload, and other business pages remain unchanged.
+- Confirm existing Crawford staff, services and appointments remain.
+
 # v1.3.3 acceptance: npm ci, typecheck, tests, build; verify booking records, logo persistence, plan team limits, password change and admin isolation after deploy.
 
 # SelahFlow v1.3.2 route validation

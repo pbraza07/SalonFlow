@@ -17,3 +17,6 @@
 .site[data-selah-theme] .featured h2,.site[data-selah-theme] .featured p{color:var(--sf-on-policy)}
 .site[data-selah-theme] .footer{background:var(--sf-footer);border-color:var(--sf-border);color:var(--sf-on-footer)}
 .site[data-selah-theme] .footer a{color:var(--sf-on-footer)}
+
+.site[data-selah-theme] .servicesSection h2,.site[data-selah-theme] .servicesHeading h2{color:var(--sf-on-page)}
+.site[data-selah-theme] .servicesSection>p,.site[data-selah-theme] .servicesHeading p{color:var(--sf-on-page)}
