@@ -11,6 +11,6 @@ export async function GET(req:Request){
     "SELECT b.slug,b.name,b.industry,b.description,b.city,b.region,st.data AS studio_data FROM businesses b LEFT JOIN settings st ON st.owner=b.owner_id WHERE b.status='active' AND b.is_listed=TRUE AND ($1='' OR b.name ILIKE '%'||$1||'%' OR b.description ILIKE '%'||$1||'%') AND ($2='' OR b.industry=$2) AND ($3='' OR b.city ILIKE '%'||$3||'%') ORDER BY b.updated_at DESC LIMIT 50",
     [q.replace(/[%_]/g,'\\$&'),industry,city.replace(/[%_]/g,'\\$&')]
   );
-  return Response.json({businesses:result.rows.map(({studio_data,...business})=>{let address='';try{address=String(JSON.parse(studio_data||'{}').address||'');}catch{}return {...business,address:address&&!address.startsWith('Add your')?address:''};})},{headers:{'Cache-Control':'public, max-age=30'}});
+  return Response.json({businesses:result.rows.map((row:{studio_data:string|null;[key:string]:unknown})=>{const {studio_data,...business}=row;let address='';try{address=String(JSON.parse(studio_data||'{}').address||'');}catch{}return {...business,address:address&&!address.startsWith('Add your')?address:''};})},{headers:{'Cache-Control':'public, max-age=30'}});
  }catch(e){console.error('Marketplace unavailable',e);return Response.json({error:'Marketplace is temporarily unavailable.'},{status:503});}
 }
