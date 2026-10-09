@@ -1,15 +1,10 @@
-# v1.5 — Browser icon refresh
-
-- Use the deep-teal Pause & Flow app icon as the browser-tab and shortcut icon on all routes.
-- Give the icon a new versioned URL so browsers can stop reusing the old purple SF favicon.
-- No business data, routes, authentication, workflows or deployment settings changed.
-
 # SelahFlow release history
 
-## Version 1.4 — Branding only — 2026-10-09
-- Applied Pause & Flow logos, deep teal/sage/ivory/gold palette and platform display name.
-- Preserved v1.3 application behavior, database/migrations, business identities, Crawford routes, authentication, permissions and deployment settings.
-- Technical SalonFlow identifiers remain unchanged for compatibility.
+## Version 1.3.1 — Branding and favicon patch — 2026-10-09
+- Applied SelahFlow Pause & Flow logos, palette and display name to the v1.3 platform.
+- Added the deep-teal browser icon with a versioned URL to refresh cached icons.
+- Corrected earlier branding release labels; this is a v1.3 patch, not a new feature milestone.
+- Preserved business data, Crawford booking, permissions, authentication, workflows and the approved roadmap.
 
 ## Version 1.3 (development branch) — 2026-10-08
 - Added additive multi-business schema, customer-facing signup, per-business booking slugs, platform admin role, business profile editor, discovery marketplace and listing approval.
@@ -43,7 +38,7 @@
 - Added Render Blueprint, database migrations, startup account provisioning and deployment instructions.
 
 ## Version convention
-User-facing releases: 1, 1.1, 1.2, 1.3, …
+Current release: 1.3.1. Branding/fix patches remain in the 1.3.x series; feature milestones follow the approved roadmap.
 ZIP filenames: SelahFlow_Studio_v1.zip, SelahFlow_Studio_v1.1.zip, …
 The package.json machine version for version 1 is 1.0.0; version 1.1 uses 1.1.0.
 Do not create an empty new version without actual changes.

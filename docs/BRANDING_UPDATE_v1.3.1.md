@@ -1,4 +1,4 @@
-# SelahFlow v1.4 — branding-only update
+# SelahFlow v1.3.1 — branding-only update
 
 Baseline: `pbraza07/SalonFlow`, commit `b3071898b828c441992d91a0f48505676d27557d` (v1.3). This release changes platform identity and presentation only. It does not extend or reorder the v1.3 development roadmap.
 
@@ -8,12 +8,12 @@ Baseline: `pbraza07/SalonFlow`, commit `b3071898b828c441992d91a0f48505676d27557d
 - Descriptor: Smart booking & AI receptionist. This is brand copy; existing feature availability remains as documented in the v1.3 roadmap.
 - `app/globals.css`: shared palette tokens, existing theme aliases, platform surfaces, controls, focus and semantic states.
 - `app/platform-pages.module.css`: matching colors for onboarding, directory, pricing, business and platform pages.
-- `app/layout.tsx`: platform title and description; favicon URL unchanged.
+- `app/layout.tsx`: platform title and description; versioned teal favicon URL.
 - Page presentation in `app/page.tsx`, `app/login/page.tsx`, `app/book/page.tsx`, `app/signup/page.tsx`, `app/business/page.tsx`, `app/discover/page.tsx`, `app/pricing/page.tsx`, `app/admin/platform/page.tsx`: platform names, logos and attribution. Individual business names/logos still come from the existing business configuration.
 - `public/brand/logo.svg`, `logo-mono.svg`, `logo-reversed.svg`: transparent horizontal logos.
 - `public/brand/symbol.svg`, `symbol-mono.svg`, `symbol-reversed.svg`: compact standalone symbols.
 - `public/brand/app-icon.svg` and `public/favicon.svg`: rounded-square icon. The flowing S and two separate pause bars remain separate shapes. Compact assets contain no tagline.
-- README, deployment guide, changelog and roadmap title: display-brand documentation updates. VERSION and package versions advance to 1.4 / 1.4.0; package name remains `salonflow-studio`.
+- README, deployment guide, changelog and roadmap title: display-brand documentation updates. VERSION and package versions advance to 1.3.1 / 1.3.1; package name remains `salonflow-studio`.
 
 ## Palette
 
@@ -35,10 +35,10 @@ The API, authentication, business logic, defaults, migrations, scripts, environm
 
 Keep the same GitHub repository, Render service, database and environment settings. Do not provision a replacement service or database. The application URLs remain:
 
-- https://salonflow-studio.onrender.com
-- https://salonflow-studio.onrender.com/book/crawford
+- https://salonflow-hf3w.onrender.com
+- https://salonflow-hf3w.onrender.com/book/crawford
 
-This package has not been pushed or deployed. Apply the source changes to the existing repository using its normal release process. Existing startup behavior is unchanged.
+The branding and favicon changes are deployed to the existing service, now named `selahflow-studio`. This patch corrects release labels to 1.3.1. The v1.4 security/billing milestone remains planned. Existing startup behavior is unchanged.
 
 ## Validation and limits
 

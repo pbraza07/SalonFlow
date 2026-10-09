@@ -1,4 +1,4 @@
-# Deploy SelahFlow version 1.2 with GitHub + Render
+# Deploy SelahFlow version 1.3.1 with GitHub + Render
 
 ## 1. Extract and upload to GitHub
 1. Download `SelahFlow_Studio_v1.2.zip` and extract it.
@@ -12,7 +12,7 @@ For Git command-line users, run these inside the extracted folder, replacing YOU
 ```bash
 git init
 git add .
-git commit -m "SelahFlow version 1.2"
+git commit -m "SelahFlow version 1.3.1"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/salonflow-studio.git
 git push -u origin main
@@ -53,7 +53,7 @@ The initial sample appointments are clearly labeled and are not database records
 4. Redeploy and use that address for login and normal operations. Once APP_URL is set, the original Render URL will not accept state-changing requests because origin protection only trusts the configured domain.
 
 ## 5. Future releases
-Version 1.3, 1.4 and later will arrive as new ZIPs. Replace the source files in the same GitHub repository and commit the update. Keep the existing Render services, environment settings, and PostgreSQL database. Trigger a deployment or use your configured GitHub automatic deployment setting.
+The current release is 1.3.1. Future patches and approved feature milestones will arrive as new ZIPs. Replace the source files in the same GitHub repository and commit the update. Keep the existing Render services, environment settings, and PostgreSQL database. Trigger a deployment or use your configured GitHub automatic deployment setting.
 
 ## Troubleshooting
 - **Build cannot find package.json:** move the ZIP's inner files to the repository root or set the correct Render root directory.
