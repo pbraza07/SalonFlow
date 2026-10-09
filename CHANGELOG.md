@@ -1,3 +1,9 @@
+## Version 1.3.2 — October 9, 2026
+- Separate public platform home from per-business dashboards.
+- Add Crawford public profile and private workspace.
+- Route login and signup to each business workspace.
+- Preserve all business and appointment records, and reserve platform slugs.
+
 # SelahFlow release history
 
 ## Version 1.3.1 — Branding and favicon patch — 2026-10-09

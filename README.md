@@ -1,3 +1,13 @@
+# SelahFlow Studio v1.3.2 — Platform and per-business routing
+
+Main platform: https://salonflow-hf3w.onrender.com/
+Crawford public business page: /crawford
+Crawford private dashboard: /studio/crawford
+Crawford booking: /book/crawford
+Business dashboard: /studio/{slug}
+Customer booking: /book/{slug}
+Crawford database records and existing SQL migrations remain unchanged.
+
 # SelahFlow Studio — Version 1.3.1 Branding Update
 
 v1.3.1 applies the Pause & Flow identity to the existing v1.3 platform. See [branding release and validation](docs/BRANDING_UPDATE_v1.3.1.md). Functional scope and the approved v1.3 roadmap remain unchanged.
