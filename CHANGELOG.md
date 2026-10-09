@@ -1,3 +1,13 @@
+## v1.3.6 — Consistent business branding, address autocomplete & Google Maps — 2026-10-09
+- Applied every business theme to every dedicated business screen: owner dashboard pages, dashboard dialogs, public booking, public business profile, and private Business Profile editor.
+- Fixed text/background contrast and font propagation in previously hardcoded dashboard, booking, and service card sections; semantic success/error messages remain distinguishable.
+- Added OpenStreetMap Photon-powered street address suggestions to dashboard Settings and Business Profile, with server-side validation, cache, request throttling, graceful manual entry fallback, and OpenStreetMap attribution.
+- Added universal Google Maps directions links to booking page, confirmation, public business pages, marketplace listings, owner settings, and private Business Profile.
+- Synchronizes the selected street address with business settings and city/region, preserving independent business ownership and existing appointments.
+- Fixed brand/header and rebooking links to retain the current business slug instead of redirecting other tenants to Crawford.
+- No new migrations, changes to booking business logic, service catalog, subscriptions, roles, or passwords.
+- Public Photon geocoding demo is intended for modest traffic. Switch to a dedicated/commercial geocoding service for production scale.
+
 ## Version 1.3.5 — Business-wide palette and typography customization — 2026-10-09
 - 20 coordinated color palettes and 12 font choices with separate heading/body typography.
 - 19 editable HEX color roles covering booking header, page, cards, policy, forms, steps, selections, buttons, links, and footer.
