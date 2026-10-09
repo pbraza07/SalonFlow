@@ -12,7 +12,7 @@ export async function POST(req:Request){
   const {currentPassword,newPassword}=JSON.parse(raw);
   if(typeof currentPassword!=='string'||currentPassword.length>256||!validNewPassword(newPassword)||currentPassword===newPassword)return Response.json({error:'Use your current password and a different new password of at least 12 characters.'},{status:400});
   const pool=getPool();
-  const attempts=await pool.query("INSERT INTO login_attempts(key,count,window_start) VALUES($1,1,now()) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END,window_start=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN now() ELSE login_attempts.count+1 END RETURNING count",['password-change:'+id]);
+  const attempts=await pool.query("INSERT INTO login_attempts(key,count,window_start) VALUES($1,1,now()) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END,window_start=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN now() ELSE login_attempts.window_start END RETURNING count",['password-change:'+id]);
   if(attempts.rows[0].count>5)return Response.json({error:'Too many attempts. Try again later.'},{status:429});
   const client=await pool.connect();try{
    await client.query('BEGIN');
