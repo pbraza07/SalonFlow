@@ -8,7 +8,7 @@ type Visit={
  id:string;date:string;time:number;duration:number;serviceNames:string[];serviceTypes:string[];
  staff:string;status:string;attended:boolean;sessionType:string;quotedPrice:number;
  answers?:{id:string;label:string;value:string|boolean}[];customerName?:string;customerEmail?:string;customerPhone?:string;
- originalSubmission?:{customerName:string;customerEmail:string;customerPhone:string;customAnswers?:Record<string,string|boolean>}|null;submittedAt?:string|null;
+ originalSubmission?:{customerName:string;customerEmail:string;customerPhone:string;customAnswers?:Record<string,string|boolean>}|null;submittedAt?:string|null;policyAccepted?:boolean;policyAcceptedAt?:string|null;
 };
 type Client={
  id:string;name:string;email:string;phone:string;bookedSessions:number;attendedSessions:number;
@@ -121,6 +121,8 @@ export default function OwnerClientDirectory({onBook}:{onBook:()=>void}){
       <div><small>Staff / team</small><b>{selected.firstBooking.staff||'Not specified'}</b></div>
       <div><small>Requested booking status</small><b>{selected.firstBooking.status}</b></div>
       <div><small>Price quoted</small><b>{money(selected.firstBooking.quotedPrice)}</b></div>
+      <div><small>Request received</small><b>{selected.firstBooking.submittedAt?new Date(selected.firstBooking.submittedAt).toLocaleString('en-US',{timeZone:'America/New_York'}):'Not available'}</b></div>
+      <div><small>Booking policy consent</small><b>{selected.firstBooking.policyAccepted?'Accepted':'Not recorded'}</b></div>
      </div>
      {!!selected.firstBooking.answers?.length&&<div className="sf-client-original-answers"><h4>Initial booking questions and answers</h4>
       {selected.firstBooking.answers.map(answer=><div key={answer.id}><small>{answer.label}</small><b>{String(selected.firstBooking?.originalSubmission?.customAnswers?.[answer.id]??answer.value)}</b></div>)}
