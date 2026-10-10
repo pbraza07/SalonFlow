@@ -430,3 +430,62 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
 .sf-booking-earliest-note small{display:block;color:#3d6450!important;font-size:11px;line-height:1.55}
 .public-page[data-selah-theme] .sf-booking-earliest-note,.app-shell[data-selah-theme] .sf-booking-earliest-note{background:#eef7f0!important;color:#1f5238!important;border-color:#bddac6!important}
 @media(max-width:650px){.sf-booking-earliest-note{margin:10px 0;padding:11px}.sf-booking-earliest-note strong{font-size:12px}}
+
+
+/* SelahFlow v1.3.19: Only the current business's configured service types.
+   When the catalog has no service category, reserve the heading area empty. */
+.legend-set.sf-business-service-legend{
+ display:flex!important;flex-wrap:wrap;align-items:center;justify-content:flex-end;
+ gap:8px 14px;min-height:25px;min-width:140px;max-width:min(52%,620px);
+ color:var(--sf-text-muted,#607369);font-size:12px;
+}
+.legend-set.sf-business-service-legend span{display:inline-flex;align-items:center;gap:6px;min-height:22px;white-space:normal;overflow-wrap:anywhere}
+.legend-set.sf-business-service-legend .dot{width:9px;height:9px;min-width:9px;margin:0}
+.sf-calendar-period-day .sf-session-chip{border-left:3px solid var(--sf-service-accent,#387459)}
+.app-shell[data-selah-theme] .cal-event.sf-session-event{border-left:4px solid var(--sf-service-accent,#387459)!important}
+@media(max-width:950px){
+ .legend-set.sf-business-service-legend{max-width:100%;min-width:0;justify-content:flex-start;margin-top:7px}
+ .schedule-panel>.panel-title{flex-wrap:wrap;gap:12px}
+}
+@media(max-width:600px){.legend-set.sf-business-service-legend{gap:7px 12px;font-size:11px}}
+
+/* Selected and unselected customer booking buttons inherit exactly one text
+   color from the active business theme. Counts never revert to muted gray. */
+.slot-grid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:53px;height:auto;line-height:1.35}
+.slot-grid button .sf-slot-time{font-size:inherit;font-weight:700;line-height:1.2;white-space:nowrap}
+.slot-grid button .sf-slot-count,.slot-grid button small{font-size:11px;line-height:1.35;display:block;white-space:normal;color:inherit!important;opacity:1!important;font-weight:600}
+.public-page[data-selah-theme] .slot-grid button :is(.sf-slot-time,.sf-slot-count,small),
+.app-shell[data-selah-theme] .slot-grid button :is(.sf-slot-time,.sf-slot-count,small){color:inherit!important;opacity:1!important}
+.public-page[data-selah-theme] .slot-grid button.picked :is(.sf-slot-time,.sf-slot-count,small),
+.app-shell[data-selah-theme] .slot-grid button.picked :is(.sf-slot-time,.sf-slot-count,small){color:inherit!important}
+@media(max-width:650px){.slot-grid button{min-width:0;padding:10px 7px;min-height:52px}.slot-grid button .sf-slot-count{font-size:10px}}
+
+/* Booking approvals — responsive customer summary and session occupancy. */
+.sf-approval-activity{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:17px 0 13px;padding:11px;border-radius:10px;border:1px solid #d8e9de;background:#f5faf6;color:#173d33}
+.sf-approval-activity>div{min-width:0;padding:2px 9px;border-right:1px solid #deebdf;overflow-wrap:anywhere}
+.sf-approval-activity>div:last-child{border-right:none}
+.sf-approval-activity small,.sf-approval-detail-grid small{display:block;margin-bottom:4px;font-size:11px;line-height:1.35;color:#587064!important;opacity:1!important;font-weight:600}
+.sf-approval-activity b,.sf-approval-detail-grid b{display:block;font-size:13px;line-height:1.5;color:#173d33!important;overflow-wrap:anywhere}
+.sf-approval-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;margin:13px 0 18px}
+.sf-approval-detail-grid>div{padding:10px 12px;border:1px solid #e2eae4;border-radius:9px;background:#fff;min-width:0}
+.sf-approval-unpaid{font-weight:500;color:#586e62!important}
+.sf-approval-seats{padding:12px 15px;margin:12px 0;border:1px solid #c8ddcf;background:#edf7f0;color:#173d33!important;border-radius:11px}
+.sf-approval-seats>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sf-approval-seats strong{color:#204c36!important;font-size:13px}
+.sf-approval-seats>div:first-child>span{color:#205943;font-weight:800;font-size:13px}
+.sf-approval-seats small{display:block;color:#476a56!important;font-size:11px;line-height:1.55;opacity:1!important}
+.sf-approval-capacity-track{width:100%;height:7px;border-radius:999px;overflow:hidden;background:#c9dfd0;margin:11px 0 9px}
+.sf-approval-capacity-track>span{display:block;height:100%;background:#247d56;transition:width .2s}
+.sf-approval-buttons{display:flex;flex-wrap:wrap;gap:9px}
+.sf-approval-buttons button{min-height:44px;white-space:normal}
+.sf-settings-form .sf-approval-field-preferences{padding:15px 16px;border:1px solid #d6e5d9;border-radius:11px;background:#f7faf7;margin:16px 0 21px}
+.sf-settings-form .sf-approval-field-preferences h3{margin:0 0 7px;color:#1b4a36!important}
+.sf-settings-form .sf-approval-field-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 12px;margin:12px 0 0}
+.sf-settings-form .sf-approval-field-choices label.sf-approval-field-toggle{display:flex;align-items:center;flex-direction:row;gap:10px;min-height:40px;padding:8px 10px;margin:2px 0;background:#fff;border:1px solid #e1ebe3;border-radius:8px;color:#264d3b;overflow-wrap:anywhere}
+.sf-settings-form .sf-approval-field-toggle input{margin:0;flex:none}
+@media(max-width:680px){
+ .sf-approval-activity{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sf-approval-activity>div{border:none;padding:4px 3px}
+ .sf-approval-detail-grid,.sf-settings-form .sf-approval-field-choices{grid-template-columns:minmax(0,1fr)}
+ .sf-approval-buttons button{width:100%}
+}
