@@ -18,7 +18,7 @@ export default function DevicePushControls({teamToken}:{teamToken?:string}){
    if(!d.configured){setStatus('Push keys have not been configured on the SelahFlow server.');return;}
    const reg=await navigator.serviceWorker.getRegistration('/');
    const subscription=await reg?.pushManager.getSubscription();
-   setEnabled(Boolean(subscription)&&Notification.permission==='granted');
+   setEnabled(Boolean(subscription)&&Notification.permission==='granted'&&Array.isArray(d.subscribedEndpoints)&&d.subscribedEndpoints.includes(subscription?.endpoint));
    setReady(true);
   }catch(e){setStatus((e as Error).message);}
  }
@@ -54,9 +54,9 @@ export default function DevicePushControls({teamToken}:{teamToken?:string}){
    if(subscription){
     const r=await fetch('/api/push',{method:'POST',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({action:'unsubscribe',endpoint:subscription.endpoint})});
     if(!r.ok)throw Error((await r.json()).error||'Unable to remove device.');
-    await subscription.unsubscribe();
+    // Browser push subscription stays active for any other opted-in businesses.
    }
-   setEnabled(false);setStatus('Notifications disabled on this device.');await refresh();
+   setEnabled(false);setStatus('Notifications disabled for this business on this device. Other businesses are unaffected.');await refresh();
   }catch(e){setStatus((e as Error).message);}finally{setBusy(false);}
  }
  return <section className="sf-push-settings" aria-label="Device push notifications">
