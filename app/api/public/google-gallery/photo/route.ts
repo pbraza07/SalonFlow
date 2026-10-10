@@ -9,7 +9,7 @@ export async function GET(req:Request){
  try{
   const row=(await getPool().query("SELECT name,google_listing_url,city,region FROM businesses WHERE slug=$1 AND status='active'",[slug])).rows[0];
   if(!row)return new Response(null,{status:404});
-  const gallery=await googleGalleryForBusiness(row),photo=gallery.photos.find(p=>p.index===idx);
+  const gallery=await googleGalleryForBusiness(row),photo=gallery.photos.find((p:{index:number;resource:string})=>p.index===idx);
   if(!photo?.resource)return new Response(null,{status:404});
   const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);
   try{
