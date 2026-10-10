@@ -29,7 +29,7 @@ export async function googleGalleryForBusiness(business){
   const match=(data.places||[]).find(p=>validGalleryMatch(businessName,p.displayName?.text));
   if(!match)return {link,photos:[],enabled:true};
   const photos=(match.photos||[]).filter(p=>validPhotoResource(p.name)).slice(0,10)
-   .map((p,i)=>({index:i,attributions:(p.authorAttributions||[]).filter(a=>a?.displayName).map(a=>({
+   .map((p,i)=>({index:i,resource:p.name,attributions:(p.authorAttributions||[]).filter(a=>a?.displayName).map(a=>({
     name:String(a.displayName).slice(0,100),
     url:typeof a.uri==='string'&&/^https?:\/\/|^\/\//.test(a.uri)?(a.uri.startsWith('//')?'https:'+a.uri:a.uri):''
    }))}));
