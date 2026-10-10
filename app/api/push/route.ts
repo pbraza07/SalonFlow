@@ -10,7 +10,7 @@ export async function GET(req:Request){try{
  const result=await c.pool.query("SELECT COUNT(*)::int AS n FROM business_push_subscriptions WHERE business_id=$1 AND reviewer=$2",[c.businessId,c.reviewer]);
  const endpoints=(await c.pool.query("SELECT endpoint FROM business_push_subscriptions WHERE business_id=$1 AND reviewer=$2",[c.businessId,c.reviewer])).rows.map((r:{endpoint:string})=>r.endpoint);
  return Response.json({configured:configured(),publicKey:configured()?process.env.VAPID_PUBLIC_KEY:null,reviewer:c.reviewer,
-   subscribedDevices:result.rows[0]?.n||0,subscribedEndpoints:endpoints},{headers});
+   businessName:c.businessName,businessSlug:c.businessSlug,subscribedDevices:result.rows[0]?.n||0,subscribedEndpoints:endpoints},{headers});
  }catch(e){return fail(e);}}
 export async function POST(req:Request){
  if(!validOrigin(req))return Response.json({error:'Invalid origin.'},{status:403,headers});
