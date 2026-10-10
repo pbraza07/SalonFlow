@@ -22,7 +22,9 @@ export async function checkCapacity(pool,owner,date,services,start,duration){
  return serviceCapacityOpen(appointments,services,start,duration);
 }
 /** Atomic staff slot + service capacity booking; advisory lock serializes bookings by business/date. */
-export async function confirmBooking({owner,services,staff,date,start,duration,buffer,id,data,pendingId=null,expectedReviewer=null}){
+/** @param {any} options Booking input validated by owner/team route handlers. */
+export async function confirmBooking(options){
+ const {owner,services,staff,date,start,duration,buffer,id,data,pendingId=null,expectedReviewer=null}=options;
  const pool=getPool(),client=await pool.connect();
  try{
   await client.query('BEGIN');
