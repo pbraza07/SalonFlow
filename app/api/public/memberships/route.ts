@@ -43,8 +43,8 @@ export async function POST(req:Request){
    throw Error('Payments are temporarily unavailable for this business.');
   const id=randomUUID(),origin=trustedOrigin(req);
   await pool.query(
-   "INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,status,stripe_account_id) VALUES($1,$2,$3,$4,$5,'pending_payment',$6)",
-   [id,item.business_id,item.id,name,email,item.external_account_id]);
+   "INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,status,stripe_account_id,price_cents) VALUES($1,$2,$3,$4,$5,'pending_payment',$6,$7)",
+   [id,item.business_id,item.id,name,email,item.external_account_id,item.price_cents]);
   const session=await stripeApi('checkout/sessions',{account:item.external_account_id,
    idempotencyKey:'membership-checkout-'+id,
    params:{
