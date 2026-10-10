@@ -4,15 +4,18 @@ const moduleURL=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base6
 test('public booking creates protected owner records; exposes catalog only; rejects conflicts and stale quotes',async()=>{
  const pg=new PGlite();const old=process.env.APP_URL;process.env.APP_URL='https://studio.example';
  try{
- for(const file of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql','004_business_customization.sql'])await pg.exec(await readFile(new URL('../migrations/'+file,import.meta.url),'utf8'));
+ for(const file of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql','004_business_customization.sql','005_business_approval_terms.sql','006_marketplace_active_businesses.sql','007_booking_approval_requests.sql'])await pg.exec(await readFile(new URL('../migrations/'+file,import.meta.url),'utf8'));
  await pg.query("INSERT INTO users(id,email,password_hash) VALUES('owner','private@example.com','secret-hash')");
  await pg.query("INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES('crawford-biz','owner','crawford','Crawford','barber')");
  let queue=Promise.resolve();const pool={async connect(){const prev=queue;let release;queue=new Promise(r=>release=r);await prev;return {query:(s,v)=>pg.query(s,v),release};}};
  const db=()=>({prepare(sql){return {sql:postgresSQL(sql),values:[],bind(...values){this.values=values;return this;},async first(){return (await pg.query(this.sql,this.values)).rows[0]||null;},async all(){return {results:(await pg.query(this.sql,this.values)).rows};}};},batch:s=>executeBatch(pool,s)});
  const defaults=await import(moduleURL(compile(await readFile(new URL('../lib/defaults.ts',import.meta.url),'utf8'))));
  const terms=await import(moduleURL(compile(await readFile(new URL('../lib/service-terms.ts',import.meta.url),'utf8'))));
- globalThis.__bookingTest={db,requireOwner:async()=>{throw Error('AUTH_REQUIRED');},validOrigin,tokenHash,...defaults,validDuration:terms.validDuration,isCalendarUnit:terms.isCalendarUnit};
- let source=await readFile(new URL('../lib/studio-handler.ts',import.meta.url),'utf8');source=source.replace(/^import .*;$/gm,'');source='const {db,requireOwner,validOrigin,tokenHash,defaultSettings,today,validDuration,isCalendarUnit}=globalThis.__bookingTest;\n'+source;
+ const helpers=await import('../server/booking-approvals.mjs');
+ const review=await import('../server/booking-review.mjs');
+ const confirmBooking=async ({owner,services,staff,date,start,duration,buffer,id,data})=>{const stm=[db().prepare("INSERT INTO appointments(id,owner,date,staff,start,duration,data,status) VALUES(?,?,?,?,?,?,?,'Confirmed')").bind(id,owner,date,staff,start,duration,JSON.stringify(data))];for(let minute=start;minute<start+duration+buffer;minute+=15)stm.push(db().prepare('INSERT INTO slots(owner,date,staff,minute,appointment) VALUES(?,?,?,?,?)').bind(owner,date,staff,minute,id));await db().batch(stm);return {id};};
+ globalThis.__bookingTest={db,requireOwner:async()=>{throw Error('AUTH_REQUIRED');},validOrigin,tokenHash,...defaults,validDuration:terms.validDuration,isCalendarUnit:terms.isCalendarUnit,validSlotCapacity:helpers.validSlotCapacity,serviceCapacityOpen:helpers.serviceCapacityOpen,confirmBooking,approvalSettings:review.approvalSettings,bookingRequestDetail:review.bookingRequestDetail};
+ let source=await readFile(new URL('../lib/studio-handler.ts',import.meta.url),'utf8');source=source.replace(/^import .*;$/gm,'');source='const {db,requireOwner,validOrigin,tokenHash,defaultSettings,today,validDuration,isCalendarUnit,validSlotCapacity,serviceCapacityOpen,confirmBooking,approvalSettings,bookingRequestDetail}=globalThis.__bookingTest;\n'+source;
  const handler=await import(moduleURL(compile(source)));
  const req=body=>new Request('https://studio.example/api/booking',{method:'POST',headers:{origin:'https://studio.example','content-type':'application/json','x-forwarded-for':'198.51.100.25'},body:JSON.stringify(body)});
  const catalog=await (await handler.publicGet(new Request('https://studio.example/api/booking'))).json();
