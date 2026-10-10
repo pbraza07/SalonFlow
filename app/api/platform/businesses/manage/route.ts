@@ -31,7 +31,7 @@ export async function POST(req:Request){
   if(!role)throw Error('FORBIDDEN');
   const raw=await req.text();if(raw.length>8000)throw Error('Invalid business request size.');
   const payload=JSON.parse(raw),action=payload.action;
-  if(!['create','edit','archive','restore'].includes(action))throw Error('Invalid business operation.');
+  if(!['create','edit','archive','restore','resetPassword'].includes(action))throw Error('Invalid business operation.');
   client=await pool.connect();
   await client.query('BEGIN');
   if(action==='create'){
@@ -47,7 +47,7 @@ export async function POST(req:Request){
    const config={...structuredClone(defaultSettings),name:input.name,tagline:input.industry,
     services:[],staff:[],products:[],phone:'',address:'',timezone:'America/New_York',
     greeting:'Welcome! How can we help?'};
-   await client.query('INSERT INTO users(id,email,password_hash) VALUES($1,$2,$3)',
+   await client.query('INSERT INTO users(id,email,password_hash,must_change_password) VALUES($1,$2,$3,TRUE)',
     [ownerId,ownerEmail,hashPassword(tempPassword)]);
    await client.query(
     'INSERT INTO businesses(id,owner_id,slug,name,industry,description,city,region,status,is_listed,listing_requested) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,FALSE)',
@@ -66,6 +66,28 @@ export async function POST(req:Request){
   const loaded=await client.query('SELECT * FROM businesses WHERE id=$1 FOR UPDATE',[payload.id]);
   const before=loaded.rows[0];if(!before)throw Error('Business not found.');
   let after:any={...before},kind=action;
+  if(action==='resetPassword'){
+   if(role!=='primary')throw Error('Only the primary platform administrator may reset business owner passwords.');
+   if(payload.confirmName!==before.name)throw Error('Confirm the exact business name before resetting the owner password.');
+   const target=(await client.query(
+    'SELECT u.id,u.email,u.must_change_password FROM users u WHERE u.id=$1 FOR UPDATE',
+    [before.owner_id])).rows[0];
+   if(!target)throw Error('Business owner account not found.');
+   const platformRole=(await client.query('SELECT role FROM platform_admins WHERE user_id=$1',[target.id])).rows[0]?.role;
+   if(platformRole)throw Error('Administrator accounts must change their own passwords through account settings.');
+   const tempPassword=randomBytes(24).toString('base64url');
+   await client.query('UPDATE users SET password_hash=$1,must_change_password=TRUE WHERE id=$2',
+    [hashPassword(tempPassword),target.id]);
+   await client.query('DELETE FROM sessions WHERE user_id=$1',[target.id]);
+   await client.query(
+    'INSERT INTO platform_business_audit(id,business_id,actor_id,action,before_record,after_record) VALUES($1,$2,$3,$4,$5::jsonb,$6::jsonb)',
+    [randomUUID(),before.id,actor,'reset_password',
+     JSON.stringify({owner_id:target.id,email:target.email}),
+     JSON.stringify({owner_id:target.id,email:target.email,sessions_revoked:true,password_change_required:true})]);
+   await client.query('COMMIT');client.release();client=null;
+   return Response.json({ok:true,ownerEmail:target.email,temporaryPassword:tempPassword,
+    message:'Owner password reset. Existing owner sessions were revoked. Share this temporary password securely; it must be changed at next sign-in.'},{headers:h});
+  }
   if(action==='edit'){
    const data=validateManagedBusiness(payload,industries,[]);
    if(isReservedBusinessSlug(data.slug)&&data.slug!==before.slug)throw Error('This business booking URL is reserved.');
