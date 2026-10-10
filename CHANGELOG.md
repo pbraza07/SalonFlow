@@ -1,3 +1,11 @@
+## v1.3.12 — Platform administrator 404 routing hotfix
+- Platform admin page is still present and restricted; when a signed-in business owner does not have an administrator role, it now redirects to an explicit access-denied screen rather than returning a misleading 404.
+- Expired/absent sessions redirect to login with the intended admin destination.
+- Admin login checks the platform role BEFORE choosing the business dashboard, so the original Crawford business owner, if also an authorized administrator, lands in /admin/platform after signing in.
+- Authorized administrators have a direct "Platform admin" navigation link on their business dashboard.
+- One-click account switch signs out a non-admin session and opens the login page. Access to admin metrics, other businesses and approvals is still enforced server-side; no ordinary business owner can bypass roles.
+- No migrations or changes to bookings, notification subscriptions, platform administrator roles, or existing business records.
+
 ## v1.3.11 — Secure business-specific device push notifications — October 9, 2026
 - Native Web Push from the owner/team's authenticated device; opt-in with notification permission, no email/SMS provider account required.
 - Adds owner dashboard notification bell with unread counts and per-reviewer read receipts; team reviewers get their own bell and push enrollment.

@@ -1,3 +1,12 @@
+# v1.3.12 Admin 404 hotfix verification
+- npm ci && npm run typecheck && npm test && npm run build
+- Logged out: /admin/platform redirects to /login rather than a 404.
+- Signed-in ordinary business account: /admin/platform redirects to /admin/access-denied with a clear Switch to administrator account button.
+- Sign in to the platform primary admin pbraza@gmail.com: redirected directly to /admin/platform, regardless of Crawford ownership.
+- Main protected admin APIs still deny nonadmins with 403. Primary admin can still approve new businesses; other admins retain their previously authorized permissions.
+- Owner dashboard shows Platform admin link ONLY to a platform admin.
+- Confirm v1.3.12 /api/health on Render and logs are healthy; no database migrations or owner data changed by hotfix.
+
 # v1.3.11 Web Push acceptance
 - npm ci, npm run typecheck, npm test, npm run build.
 - Verify /api/health reports 1.3.11, /sw.js and /manifest.webmanifest available on HTTPS.
