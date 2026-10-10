@@ -1,0 +1,17 @@
+'use client';
+import {useEffect,useState} from 'react';
+import BookingRequestCards,{type BookingRequest} from './booking-request-cards';
+type Staff={id:string;name:string};
+export default function OwnerBookingApprovals({staff}:{staff:Staff[]}){
+ const [items,setItems]=useState<BookingRequest[]>([]),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('');
+ async function refresh(){try{const r=await fetch('/api/studio/approvals',{cache:'no-store'}),d=await r.json();if(!r.ok)throw Error(d.error||'Review inbox unavailable.');setItems(d.pending||[]);setEnabled(d.enabled);setError('');}catch(e){setError((e as Error).message);}}
+ useEffect(()=>{refresh();const id=setInterval(refresh,20000);return()=>clearInterval(id);},[]);
+ async function review(id:string,accept:boolean){setBusy(id);setNotice('');setError('');try{const r=await fetch('/api/studio/approvals',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'review',id,accept})}),d=await r.json();if(!r.ok)throw Error(d.error||'Unable to review booking.');setNotice(accept?'Accepted. The appointment is confirmed on your calendar.':'Declined. No calendar appointment was created.');await refresh();window.dispatchEvent(new Event('selahflow:booking-reviewed'));}catch(e){setError((e as Error).message);}finally{setBusy('');}}
+ if(!enabled&&items.length===0)return null;
+ return <section className="panel padded section-gap sf-approval-inbox" aria-label="Booking approval notifications">
+ <div className="sf-approval-heading"><div><h2>Booking approval notifications {items.length>0?<span className="sf-request-badge">{items.length} waiting</span>:null}</h2><p className="muted">New requests appear here automatically while your dashboard is open. Accept to confirm and add the booking to the calendar. Decline to leave the calendar unchanged.</p></div><button type="button" className="outline" onClick={refresh}>Refresh requests</button></div>
+ {notice&&<p role="status" className="notice">{notice}</p>}{error&&<p role="alert" className="alert">{error}</p>}
+ {items.length?<BookingRequestCards items={items} busy={busy} onReview={review} team={staff}/>:<p className="muted">No appointments are awaiting approval.</p>}
+ <p className="muted"><small>In-app notifications only. Email, SMS and push notifications are not yet connected. Pending times are not reserved until accepted.</small></p>
+ </section>;
+}
