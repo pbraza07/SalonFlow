@@ -189,3 +189,15 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
 .sf-team-review-body .outline{background:#fff;color:#123f3a;border:1px solid #123f3a}
 .sf-empty-notifications{padding:25px;border-radius:12px;background:#e2ece7}
 @media(max-width:550px){.sf-approval-buttons button{width:100%}.sf-staff-link input{width:100%}.sf-approval-title{flex-direction:column}}
+
+/* v1.3.10 delivery choices and secure review page */
+.sf-notification-checkboxes{display:grid;gap:10px;margin:14px 0}
+.sf-notification-checkboxes .sf-toggle-row{display:flex;align-items:center;gap:12px;flex-direction:row}
+.sf-notification-contacts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:12px 0}
+.sf-notification-contacts label{min-width:0}
+.sf-delivery-provider-status{background:var(--sf-policy,#ecf1eb);color:var(--sf-on-policy,#173e37);padding:12px 15px;border-radius:10px;margin:16px 0}
+.sf-delivery-provider-status>div{margin-bottom:5px}
+.sf-approval-delivery{display:grid;gap:8px;margin-top:10px}
+.sf-approval-delivery>div{border-left:3px solid var(--sf-accent,#af9b68);padding:11px;background:var(--sf-surface,#fff);color:var(--sf-on-surface,#173e37);border-radius:5px}
+.sf-approval-delivery button{margin-top:8px}
+@media(max-width:600px){.sf-notification-contacts{grid-template-columns:1fr}}

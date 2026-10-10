@@ -1,3 +1,11 @@
+# SelahFlow v1.3.10 — Email and SMS Booking Review Links
+
+Select **Dashboard → Settings → Booking requests and reviewer notifications**. Enable booking approval, choose Business owner or a team reviewer, and tick **Send by email**, **Send by SMS**, or both. For the owner, enter a notification phone in E.164 format and optionally override the signed-in email. For team members, enter their email and phone under **Your team**, then save. A new customer booking creates a pending request and sends its details and a 72-hour review link to the designated recipient using connected providers. Click **Accept** or **Decline** on the linked page to make a decision.
+
+**Production provider setup is mandatory for external delivery.** Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL` (verified sender), `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` in the Render service environment. Without these secrets, channels show **Not configured**, and no email/text messages are sent; in-app notifications continue working. Providers may require sender verification and compliant SMS registrations. A submitted message means the provider accepted the request, not that the recipient's device delivered it.
+
+See `docs/RELEASE_v1.3.10_OUTBOUND_APPROVALS.md`.
+
 # SelahFlow v1.3.9 — Appointment review notifications
 
 The business owner can enable booking approvals in Dashboard → Settings, designate themselves or a team member reviewer, and set simultaneous booking slot limits for every service. Incoming requests appear in the dashboard while it is open; an authorized staff reviewer may receive a private 30-day link for the dedicated review inbox. Pending online requests do **not** reserve times, appear as confirmed appointments, or collect payment. After acceptance, appointment and staff calendar slots are saved transactionally after conflict checks. A decline creates no calendar booking.

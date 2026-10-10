@@ -1,3 +1,13 @@
+## v1.3.10 — Email and SMS booking review notifications (2026-10-09)
+- Opt-in owner Settings checkboxes choose email, SMS, or both for booking approval messages to either owner or designated team member.
+- Owner may use signed-in email or override it and store a dedicated phone. Staff members can have individual email and mobile notification contact details.
+- A pending request dispatches appointment details with a unique, 72-hour Accept/Decline review link via Resend (email) or Twilio (SMS), when the provider credentials are configured.
+- Review link GET never modifies state; authenticated one-time request-specific token permits POST Accept or Decline only after explicit confirmation.
+- Accept still transactionally validates staff calendar and service capacity, declining leaves calendar untouched; open pending request cannot reserve a slot.
+- Delivery attempts record submitted, failed, not-configured, invalid-destination; owner dashboard displays per-channel outcomes and allows rate-limited retries of unsent channels.
+- Existing in-app owner and team review workflows remain; no credential values or recipient details are published in customer booking responses.
+- Migration 008 is additive and preserves all previous appointments.
+
 ## v1.3.9 — Optional booking approvals and service capacity (2026-10-09)
 - Business owners can enable booking approval notifications, choose the owner or an assigned staff member as reviewer, and view live in-app pending requests.
 - Team reviewers can use revocable, private, 30-day access links, with dedicated in-app request inbox and accept/decline actions; do not share owner credentials.
