@@ -24,6 +24,6 @@ test('admin password policy and team entitlement are enforced by APIs',async()=>
  assert.match(studio,/Team member limit reached/);assert.match(studio,/future bookings before removing/);assert.match(studio,/business_subscriptions/);
  const pass=await readFile(new URL('../app/api/account/password/route.ts',import.meta.url),'utf8');
  assert.match(pass,/verifyPassword/);assert.match(pass,/hashPassword/);assert.match(pass,/DELETE FROM sessions/);
- const page=await readFile(new URL('../app/admin/platform/page.tsx',import.meta.url),'utf8');assert.match(page,/getPlatformRole/);assert.match(page,/notFound/);
+ const page=await readFile(new URL('../app/admin/platform/page.tsx',import.meta.url),'utf8');assert.match(page,/getPlatformRole/);assert.match(page,/redirect\('\/admin\/access-denied'\)/);
  const admins=await readFile(new URL('../app/api/platform/admins/route.ts',import.meta.url),'utf8');assert.match(admins,/role!=='primary'/);
 });

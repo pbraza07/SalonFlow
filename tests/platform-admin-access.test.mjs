@@ -21,7 +21,7 @@ test('v1.3.12 routes invalid/non-admin sessions to helpful pages instead of a mi
 test('v1.3.12 legitimate primary remains admin; ordinary business owner cannot enter',async()=>{
  const pg=new PGlite();
  try{
-  for(const migration of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql'])await pg.exec(await read('migrations/'+migration));
+  for(const migration of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql','004_business_customization.sql'])await pg.exec(await read('migrations/'+migration));
   await pg.query("INSERT INTO users(id,email,password_hash) VALUES('primary','pbraza@gmail.com','x'),('other','other@example.com','x'),('secondary','secondary@example.com','x')");
   await pg.query("INSERT INTO businesses(id,owner_id,slug,name,industry) VALUES('biz1','primary','crawford','Crawford','barber'),('biz2','other','other-business','Other','barber')");
   await pg.query("INSERT INTO platform_admins(user_id,role) VALUES('primary','primary'),('secondary','admin')");
