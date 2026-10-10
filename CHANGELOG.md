@@ -1,3 +1,9 @@
+## v1.3.14 — Universal business-neutral service icon
+- Replaces hair-salon-specific scissors in the Services navigation and Checkout service cards with Lucide Shapes, a neutral symbol for services across all supported industries.
+- Replaces scissors on the public booking loading state with the same universal service symbol.
+- Preserves uploaded business logos, SelahFlow brand identity, custom color palettes, appointments, booking approvals and payment workflows.
+- Adds automated regression checks to prevent scissors returning in shared business UI.
+
 ## v1.3.12 — Platform administrator 404 routing hotfix
 - Platform admin page is still present and restricted; when a signed-in business owner does not have an administrator role, it now redirects to an explicit access-denied screen rather than returning a misleading 404.
 - Expired/absent sessions redirect to login with the intended admin destination.
