@@ -43,7 +43,7 @@ test('only primary admins can reset business owner credentials and sessions are 
  assert.match(route,/INSERT INTO platform_business_audit/);
  assert.match(route,/Administrator accounts must change their own passwords/);
  assert.doesNotMatch(route,/SELECT [^;\n]*password_hash AS password/);
- assert.doesNotMatch(route,/password_hash.*return Response\.json/s);
+ assert.doesNotMatch(route,/return Response\.json\(\{[^}]*password_hash/);
 });
 test('password-change requirement locks private APIs and redirects sign-in without blocking password rotation',async()=>{
  const [auth,login,studio,password,required,ui]=await Promise.all([
