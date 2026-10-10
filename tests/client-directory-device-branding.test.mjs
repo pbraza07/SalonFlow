@@ -48,6 +48,43 @@ test('email normalization is stable and unrelated customers never group solely b
  assert.notEqual(buildClientDirectory([a],settings,'another-owner')[0].id,id);
  assert.notEqual(list[0].id,list[1].id);
 });
+test('different customer names with the same email and phone remain separate client cards',()=>{
+ const sameEmail='family@example.com';
+ const first=appointment('dad','a','Carlos Perez',sameEmail,'2026-10-01','Completed');
+ const second=appointment('son','a','Diego Perez',sameEmail,'2026-10-02','Checked in');
+ const list=buildClientDirectory([first,second],settings,'a');
+ assert.equal(list.length,2);
+ assert.deepEqual(list.map(c=>c.name).sort(),['Carlos Perez','Diego Perez']);
+ assert.equal(list.find(c=>c.name==='Carlos Perez').attendedSessions,1);
+ assert.equal(list.find(c=>c.name==='Diego Perez').attendedSessions,1);
+ const all=clientWorkbookSheets(list);
+ assert.equal(all[0].rows.length,3,'Each different name must export on a distinct client row');
+});
+test('same full name can be matched by email OR phone across multiple bookings',()=>{
+ const first={...appointment('one','a','Taylor Lee','taylor@example.com','2026-10-01','Completed'),
+  data:JSON.stringify({name:'Taylor Lee',email:'taylor@example.com',phone:'813-555-0141',services:['Small Group Session'],serviceIds:['coaching']})};
+ const second={...appointment('two','a','Taylor Lee','another@example.com','2026-10-02','Completed'),
+  data:JSON.stringify({name:'Taylor Lee',email:'another@example.com',phone:'813-555-0141',services:['Small Group Session'],serviceIds:['coaching']})};
+ const third={...appointment('three','a','Taylor Lee','another@example.com','2026-10-03','Completed'),
+  data:JSON.stringify({name:'Taylor Lee',email:'another@example.com',phone:'',services:['Small Group Session'],serviceIds:['coaching']})};
+ const list=buildClientDirectory([first,second,third],settings,'a');
+ assert.equal(list.length,1);
+ assert.equal(list[0].attendedSessions,3);
+ assert.equal(list[0].attendanceDays.length,3);
+ const sharedPhoneDifferentName={...second,id:'four',data:JSON.stringify({name:'Morgan Lee',email:'another@example.com',phone:'813-555-0141',services:['Small Group Session'],serviceIds:['coaching']})};
+ assert.equal(buildClientDirectory([first,second,third,sharedPhoneDifferentName],settings,'a').length,2);
+});
+test('name auto-population stays local to a business and never includes contact or custom fields',async()=>{
+ const booking=await readFile(new URL('../app/book/page.tsx',import.meta.url),'utf8');
+ assert.match(booking,/selahflow:remembered-booking-name:/);
+ assert.match(booking,/localStorage\.getItem/);
+ assert.match(booking,/localStorage\.setItem/);
+ assert.match(booking,/Not you\? Clear name/);
+ assert.match(booking,/name="email" type="email" maxLength=\{200\} autoComplete="off"/);
+ assert.match(booking,/name="phone" type="tel" maxLength=\{40\} autoComplete="off"/);
+ assert.doesNotMatch(booking,/localStorage\.setItem\([^)]*email/);
+ assert.doesNotMatch(booking,/localStorage\.setItem\([^)]*customAnswers/);
+});
 test('Excel workbook has three named worksheets and preserves attendance facts',()=>{
  const c=buildClientDirectory([
   appointment('1','a','Alex','alex@example.com','2026-10-01','Completed'),
