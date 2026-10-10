@@ -8,7 +8,7 @@ export async function GET(req:Request){try{
  const {rows}=await pool.query("SELECT r.id,r.date,r.start_minute,r.created_at::text AS created_at,r.details,(reads.request_id IS NULL) AS unread FROM booking_requests r LEFT JOIN business_notification_reads reads ON reads.business_id=r.business_id AND reads.reviewer=$2 AND reads.request_id=r.id WHERE r.business_id=$1 AND r.status='pending' AND ($2='owner' OR r.reviewer=$2) ORDER BY r.created_at DESC LIMIT 100",[businessId,reviewer]);
  const items=rows.map((r:{details:string;[key:string]:unknown})=>{let d:any={};try{d=JSON.parse(r.details)}catch{}
   const {details,...rest}=r;return {...rest,customerName:String(d.customerName||'').slice(0,100),services:Array.isArray(d.services)?d.services.slice(0,5):[]};});
- return Response.json({items,unread:items.filter(x=>x.unread).length,pending:items.length},{headers});
+ return Response.json({items,unread:items.filter((x:{unread:boolean})=>x.unread).length,pending:items.length},{headers});
  }catch{return fail();}}
 export async function POST(req:Request){
  if(!validOrigin(req))return Response.json({error:'Invalid request origin.'},{status:403,headers});

@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 const decodeKey=(raw:string)=>{const padded=raw.padEnd(Math.ceil(raw.length/4)*4,'=').replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(padded),c=>c.charCodeAt(0));};
 export default function DevicePushControls({teamToken}:{teamToken?:string}){
  const [supported,setSupported]=useState(false),[installed,setInstalled]=useState(false),[permission,setPermission]=useState('default'),[ready,setReady]=useState(false),[configured,setConfigured]=useState(false),[devices,setDevices]=useState(0),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
- const headers=teamToken?{Authorization:'Bearer '+teamToken}:{};
+ const headers:Record<string,string>=teamToken?{Authorization:'Bearer '+teamToken}:{};
  const ios=typeof navigator!=='undefined'&&/iPad|iPhone|iPod/.test(navigator.userAgent);
  async function refresh(){
   const capable=typeof window!=='undefined'&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
