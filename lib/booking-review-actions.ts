@@ -26,7 +26,7 @@ export async function reviewPendingRequest(owner:string,id:string,reviewer:strin
  if(row.start_minute<config.open*60||row.start_minute+row.duration+config.buffer>config.close*60)throw Error('This appointment no longer fits business hours.');
  const appointmentId=randomUUID();
  const payload:any={name:data.customerName,email:data.customerEmail,phone:data.customerPhone,services:services.map((s:{name:string})=>s.name),
-  serviceIds:services.map((s:{id:string})=>s.id),price:data.quotedPrice,channel:'Approved online booking',created:new Date().toISOString(),reviewedBy:reviewer,bookingRequestId:id,sessionId:data.sessionId||null,customAnswers:data.customAnswers||{}};
+  serviceIds:services.map((s:{id:string})=>s.id),price:data.quotedPrice,channel:'Approved online booking',created:new Date().toISOString(),reviewedBy:reviewer,bookingRequestId:id,sessionId:data.sessionId||null,customAnswers:data.customAnswers||{},customFieldLabels:data.customFieldLabels||{},originalSubmission:data.originalSubmission||null,bookingDetailsEditedAt:data.correctedAt||null};
  await confirmBooking({owner,services,staff:row.staff_id,date:row.date,start:row.start_minute,duration:row.duration,
   buffer:config.buffer,id:appointmentId,data:payload,pendingId:id,expectedReviewer:reviewer});
  return {ok:true,status:'accepted',appointmentId};
