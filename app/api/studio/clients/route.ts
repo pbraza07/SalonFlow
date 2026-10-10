@@ -10,7 +10,7 @@ import {resolveTheme} from '../../../../server/themes.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const noStore={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'};
-const validId=id=>typeof id==='string'&&/^[a-f0-9-]{32,36}$/i.test(id);
+const validId=(id:unknown)=>typeof id==='string'&&/^[a-f0-9-]{32,36}$/i.test(id);
 async function businessFor(owner: string,db:{query:(sql:string,values:unknown[])=>Promise<{rows:any[]}>}){
  const result=await db.query(
   "SELECT b.slug,b.name,b.status,b.brand_primary,b.brand_background,s.data AS settings_data FROM businesses b JOIN settings s ON s.owner=b.owner_id WHERE b.owner_id=$1",
