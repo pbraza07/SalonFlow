@@ -5,10 +5,12 @@ type Any=any;
 export default function OwnerTermTracker({services,compact=false}:{services:Any[];compact?:boolean}){
  const [items,setItems]=useState<Any[]>([]),[counts,setCounts]=useState<Any[]>([]),[serviceId,setServiceId]=useState(''),[name,setName]=useState(''),[email,setEmail]=useState(''),[start,setStart]=useState(new Date().toISOString().slice(0,10)),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('');
  const plans=services.filter(s=>isTermUnit(s.durationUnit||'minutes'));
+ const hasTermTracking=plans.length>0||items.length>0;
  async function load(){try{const r=await fetch('/api/studio/terms',{cache:'no-store'}),d=await r.json();if(!r.ok)throw Error(d.error||'Unable to load service terms.');setItems(d.enrollments||[]);setCounts(d.counts||[]);}catch(e){setError((e as Error).message);}}
  useEffect(()=>{load();},[]);
  const current=(unit:string)=>counts.filter(c=>c.duration_unit===unit).reduce((n,c)=>n+c.active,0);
  async function perform(body:unknown){setBusy(true);setError('');setMessage('');try{const r=await fetch('/api/studio/terms',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),d=await r.json();if(!r.ok)throw Error(d.error||'Unable to save service enrollment.');setMessage('Enrollment tracking updated.');await load();return true;}catch(e){setError((e as Error).message);return false;}finally{setBusy(false);}}
+ if(!hasTermTracking)return null;
  return <section className="panel padded section-gap" aria-label="Long-term service tracking"><h2>Long-term service tracking</h2><p className="muted">Track customer enrollments for services lasting days, weeks, months, or years. This is manual tracking, not recurring payments or calendar bookings.</p>
  <div className="sf-term-stats"><div><b>{current('months')}</b><span>Active monthly enrollments</span></div><div><b>{current('years')}</b><span>Active annual enrollments</span></div><div><b>{items.length}</b><span>All recorded enrollments</span></div></div>
  {error&&<p role="alert" className="alert">{error}</p>}{message&&<p role="status" className="notice">{message}</p>}

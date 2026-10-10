@@ -1,3 +1,12 @@
+## SelahFlow v1.3.8 — Marketplace backfill and platform business drilldown (2026-10-09)
+- Existing approved active businesses, including previously non-listed businesses, are published to the marketplace by one-time additive migration 006.
+- The public marketplace returns all active businesses, independent of stale preexisting is_listed flags; pending, rejected and suspended businesses remain hidden.
+- Platform admin dashboard now includes a clickable, responsive directory of all registered businesses, with industry, city, owner, plan, status and appointment totals.
+- Protected administrator-only detail endpoint returns business profile, services, team, aggregate client counts, and the latest 200 customer appointments with status and quoted prices. No customer history is exposed in the public marketplace.
+- Monthly/yearly service tracking panels are hidden for businesses with no term-service catalog or historical enrollments; no empty tracking sections are shown in the platform dashboard.
+- Active business listings cannot be manually disabled through the legacy listing-approval API.
+- Existing bookings, tenants, branding and database records are preserved. Recurring billing remains inactive.
+
 ## v1.3.7 — Business approval, duration units and service-term tracking — October 9, 2026
 
 - New business registrations enter 'pending'; primary platform administrator approves/declines from the protected dashboard.

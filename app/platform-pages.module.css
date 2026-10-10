@@ -49,3 +49,42 @@
 .businessTheme .sf-address-field .sf-address-option{background:var(--sf-surface);color:var(--sf-on-surface)}
 .businessTheme .sf-address-field .sf-address-option:hover,.businessTheme .sf-address-field .sf-address-option.active{background:var(--sf-selected);color:var(--sf-on-selected)}
 
+
+/* v1.3.8: responsive and keyboard-accessible platform administrator business drilldown. */
+.directoryHeading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.directoryHeading p{max-width:750px}
+.directoryCount{display:inline-flex;align-items:center;background:var(--brand-selected,#e4ede5);padding:8px 12px;border-radius:50px;color:var(--brand-primary,#123f3a);font-weight:750;white-space:nowrap}
+.directoryControls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:10px 0 20px}
+.directoryControls label{margin:0!important}
+.directoryGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:12px 0}
+.directoryTile{display:flex;align-items:flex-start;flex-direction:column;text-align:left;gap:7px;padding:18px;background:var(--brand-background,#f7f4ec);color:var(--brand-primary,#123f3a);border:2px solid var(--brand-border,#c6d6cb);border-radius:13px;min-height:160px;transition:border-color .15s,box-shadow .15s}
+.directoryTile:hover,.directoryTile:focus-visible,.directoryTileSelected{border-color:var(--brand-primary,#123f3a);box-shadow:0 0 0 2px #b6ceb8}
+.directoryTile strong{font-size:18px;line-height:1.25}
+.directoryTile>span{font-size:13px}
+.directoryTile small{font-size:12px}
+.directoryStatus{display:inline-flex!important;padding:4px 9px;background:var(--brand-selected,#e0ede0);color:var(--brand-primary,#123f3a);border-radius:30px;font-weight:700}
+.directorySummary{margin-top:auto}
+.directoryOpen{font-weight:750;text-decoration:underline;text-underline-offset:3px}
+.directoryDetail{margin-top:22px;border-top:1px solid var(--brand-border,#bbcabb);padding-top:24px;scroll-margin-top:20px}
+.directoryDetail h3{font-family:var(--sf-heading-font,Manrope,sans-serif);color:var(--brand-primary,#123f3a);font-size:18px;margin:22px 0 12px}
+.directoryDetail strong,.directoryDetail b{color:var(--brand-primary,#123f3a)}
+.directoryDetail p{margin:9px 0;overflow-wrap:anywhere}
+.directoryDetail a{color:var(--brand-primary,#123f3a);text-decoration:underline}
+.directoryDetailTitle{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.directoryDetailTitle h2{font-size:28px}
+.detailColumns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:25px;margin:18px 0}
+.detailColumns>section{min-width:0}
+.detailSubheading{margin-top:25px!important}
+.detailMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}
+.detailMetrics>div{border-radius:10px;background:var(--brand-selected,#e4ede5);padding:14px;display:flex;flex-direction:column;gap:5px;color:var(--brand-primary,#123f3a)}
+.detailMetrics b{font-size:28px}
+.detailMetrics span{font-size:12px}
+.detailTableWrap{max-width:100%;overflow:auto;border:1px solid var(--brand-border,#c6d6cb);border-radius:10px;margin:14px 0}
+.detailTable{width:100%;border-collapse:collapse;min-width:580px;background:var(--brand-surface,#fff);font-size:13px}
+.detailTable th,.detailTable td{text-align:left;padding:11px;vertical-align:top;border-bottom:1px solid var(--brand-border,#c6d6cb);color:var(--brand-ink,#203630)}
+.detailTable th{background:var(--brand-selected,#e4ede5);color:var(--brand-primary,#123f3a);font-weight:750;white-space:nowrap}
+.metric[href]{display:block;text-decoration:none;cursor:pointer}
+.metric[href]:hover{outline:2px solid var(--brand-primary,#123f3a)}
+.metric[href] span{font-size:12px;text-decoration:underline}
+@media(max-width:650px){.directoryControls,.detailColumns{grid-template-columns:1fr}.directoryGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.directoryTile{padding:12px;min-height:155px}.directoryTile strong{font-size:15px}.detailMetrics{grid-template-columns:1fr 1fr}.directoryDetailTitle h2{font-size:22px}}
+@media(max-width:385px){.directoryGrid{grid-template-columns:1fr}.detailMetrics{grid-template-columns:1fr}}
