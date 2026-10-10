@@ -1,6 +1,6 @@
 import {db} from './database';
 import {getPool} from '../server/database.mjs';
-import {appointmentData,overlaps,bookingDateRange,computeDayAvailability,selectedSession,validateBookableSessions,validateExistingSessionReservations} from '../server/session-scheduling.mjs';
+import {appointmentData,overlaps,easternClock,bookingDateRange,computeDayAvailability,selectedSession,validateBookableSessions,validateExistingSessionReservations} from '../server/session-scheduling.mjs';
 import {validateBookingFields,sanitizeBookingAnswers} from '../server/booking-custom-fields.mjs';
 import {requireOwner} from './auth';
 import {tokenHash,validOrigin,trustedOrigin} from '../server/security.mjs';
@@ -93,8 +93,8 @@ if(b.action==='calendar'){
  const reservations=(await db().prepare(
   "SELECT date,minute FROM slots WHERE owner=? AND staff=? AND date>=? AND date<=?"
  ).bind(owner,b.staff,days[0],days[days.length-1]).all()).results as any[];
- const timeParts=new Intl.DateTimeFormat('en-GB',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()).split(':').map(Number);
- const now=timeParts[0]*60+timeParts[1],current=today();
+ const clock=easternClock();
+ const now=clock.minutes,current=clock.date;
  const lastFuture=new Date(Date.now()+366*86400000).toISOString().slice(0,10);
  return reply({timezone:'America/New_York',days:days.map((date:string)=>{
   if(date<current||date>lastFuture)return {date,available:0,sessions:[]};
@@ -111,13 +111,13 @@ const occupied=(await db().prepare('SELECT minute FROM slots WHERE owner=? AND d
 const sameDay=(await db().prepare(
  "SELECT staff,start,duration,status,data FROM appointments WHERE owner=? AND date=? AND status NOT IN ('Cancelled','No-show')"
 ).bind(owner,b.date).all()).results as any[];
-const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()).split(':').map(Number);
+const clock=easternClock();
 const availability=computeDayAvailability({config,date:b.date,staff:b.staff,services,
- appointments:sameDay,reservedSlots:occupied,today:today(),
- nowMinutes:parts[0]*60+parts[1],capacityOpen:serviceCapacityOpen});
+ appointments:sameDay,reservedSlots:occupied,today:clock.date,
+ nowMinutes:clock.minutes,capacityOpen:serviceCapacityOpen});
 const available=availability.slots;
 if(b.action==='availability')return reply({slots:available,sessionAvailability:availability.sessionAvailability,
- sessions:availability.sessions,duration,price:services.reduce((a:number,s:any)=>a+s.price,0)});
+ sessions:availability.sessions,earliestStart:availability.earliestStart,firstAvailable:availability.firstAvailable,timezone:'America/New_York',duration,price:services.reduce((a:number,s:any)=>a+s.price,0)});
 if(b.key){const prior=await db().prepare('SELECT id FROM appointments WHERE owner=? AND id=?').bind(owner,b.key).first();if(prior)return reply({ok:true,id:prior.id});const pending=await db().prepare('SELECT id,status,appointment_id FROM booking_requests WHERE owner_id=? AND id=?').bind(owner,b.key).first<{id:string;status:string;appointment_id:string|null}>();if(pending)return reply({ok:true,id:pending.id,pending:pending.status==='pending',status:pending.status,appointmentId:pending.appointment_id});}if(b.expectedPrice!==services.reduce((a:number,s:any)=>a+s.price,0)||b.expectedDuration!==duration)return reply({error:'Service prices or durations changed. Refresh the studio and review your booking again.'},409);if(!available.includes(b.start))return reply({error:'That time is no longer available. Please choose another.'},409);if(typeof b.name!=='string'||typeof b.email!=='string'||!b.name.trim()||b.name.length>100||!/^\S+@\S+\.\S+$/.test(b.email)||b.email.length>200)throw Error('Enter a name and valid email.');const customAnswers=sanitizeBookingAnswers(config.bookingCustomFields||[],b.customAnswers);
 const id=typeof b.key==='string'&&/^[0-9a-f-]{36}$/.test(b.key)?b.key:crypto.randomUUID();const data:any={name:b.name.trim(),email:b.email,phone:String(b.phone||'').slice(0,40),services:services.map((s:any)=>s.name),price:services.reduce((a:number,s:any)=>a+s.price,0),channel:isPublic?'Online booking':b.channel==='Booking portal'?'Booking portal':'Front desk',created:new Date().toISOString()};data.serviceIds=services.map((s:any)=>s.id);data.customAnswers=customAnswers;const bookedSession=selectedSession(config,b.date,b.staff,services,b.start);if(bookedSession)data.sessionId=bookedSession.id;
  if(isPublic&&approvalSettings(config).enabled){

@@ -1,6 +1,20 @@
 /** Pure, business-scoped session and appointment availability helpers.
  * Pending booking requests do not consume capacity until accepted.
  */
+/** Business-local clock, independent of the Render server's UTC clock.
+ * Same-day slots start on the next quarter hour with no arbitrary one-hour delay.
+ */
+export function easternClock(at=new Date()) {
+ const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',
+  month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(at);
+ const values=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+ return {date:values.year+'-'+values.month+'-'+values.day,
+   minutes:Number(values.hour)*60+Number(values.minute)};
+}
+export function nextQuarterHour(minutes) {
+ if(!Number.isFinite(minutes)||minutes<0||minutes>=1440)throw Error('Invalid local clock minutes.');
+ return Math.ceil((minutes+1)/15)*15;
+}
 export function appointmentData(appointment) {
   if (!appointment) return {};
   if (appointment.sessionId !== undefined) return appointment;
@@ -111,10 +125,10 @@ export function computeDayAvailability({config, date, staff, services, appointme
     id:s.id, date:s.date, staff:s.staff, service:s.service, start:s.start,
     capacity:s.capacity, remaining:sessionRemaining(s,active)
   }));
-  if (date < today) return {slots,sessionAvailability,sessions:fullSessions};
+  if (date < today) return {slots,sessionAvailability,sessions:fullSessions,earliestStart:null,firstAvailable:null};
   const duration = services.reduce((n,s) => n + s.duration,0);
   const buffer = config.buffer || 0;
-  const earliest = date === today ? Math.ceil((nowMinutes + 1) / 15) * 15 : 0;
+  const earliest = date === today ? nextQuarterHour(nowMinutes) : 0;
   for (let start = Math.ceil(config.open * 60 / 15) * 15;
        start + duration + buffer <= config.close * 60; start += 15) {
     if (start < earliest) continue;
@@ -139,5 +153,5 @@ export function computeDayAvailability({config, date, staff, services, appointme
           capacityOpen(ordinaryAppointments,services,start,duration)) slots.push(start);
     }
   }
-  return {slots,sessionAvailability,sessions:fullSessions};
+  return {slots,sessionAvailability,sessions:fullSessions,earliestStart:date===today?earliest:null,firstAvailable:slots[0]??null};
 }
