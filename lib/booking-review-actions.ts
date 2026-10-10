@@ -21,7 +21,7 @@ export async function reviewPendingRequest(owner:string,id:string,reviewer:strin
  if(services.reduce((sum:number,s:{duration:number})=>sum+s.duration,0)!==row.duration)throw Error('Service duration changed. Decline and ask the customer to rebook.');
  if(row.start_minute<config.open*60||row.start_minute+row.duration+config.buffer>config.close*60)throw Error('This appointment no longer fits business hours.');
  const appointmentId=randomUUID();
- const payload={name:data.customerName,email:data.customerEmail,phone:data.customerPhone,services:services.map((s:{name:string})=>s.name),
+ const payload:any={name:data.customerName,email:data.customerEmail,phone:data.customerPhone,services:services.map((s:{name:string})=>s.name),
   serviceIds:services.map((s:{id:string})=>s.id),price:data.quotedPrice,channel:'Approved online booking',created:new Date().toISOString(),reviewedBy:reviewer,bookingRequestId:id};
  await confirmBooking({owner,services,staff:row.staff_id,date:row.date,start:row.start_minute,duration:row.duration,
   buffer:config.buffer,id:appointmentId,data:payload,pendingId:id,expectedReviewer:reviewer});
