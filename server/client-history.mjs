@@ -153,12 +153,13 @@ export function clientWorkbookSheets(clients){
  const timeLabel=n=>((Math.floor(n/60)%12)||12)+':'+String(n%60).padStart(2,'0')+(n<720?' AM':' PM');
  for(const c of selected){
   summary.push([c.name,c.email,c.phone,c.bookedSessions,c.attendedSessions,c.attendanceDays.length,c.serviceTypes.join(', '),c.latestDate]);
-  for(const v of c.history)visits.push([
+  for(const v of c.history){visits.push([
    c.name,c.email,v.date,timeLabel(v.time),v.serviceNames.join(', '),v.serviceTypes.join(', '),v.staff,v.status,v.sessionType,v.quotedPrice,v.attended?'Yes':'No'
   ]);
   for(const ans of v.answers||[]){
    const original=v.originalSubmission?.customAnswers?.[ans.id];
    responses.push([c.name,c.email,v.status,v.date,timeLabel(v.time),ans.label,String(ans.value),original===undefined?'':String(original)]);
+  }
   }
   for(const day of c.attendanceDays){
    const visitsOnDay=c.history.filter(v=>v.date===day&&v.attended);
