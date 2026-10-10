@@ -23,7 +23,7 @@ export async function GET(req:Request){try{const {pool,owner,settings,business}=
  const delivery:Record<string,Record<string,{status:string;destination:string;at:string}>>={};for(const a of attempts.rows){delivery[a.request_id]??={};delivery[a.request_id][a.channel]={status:a.status,destination:a.destination_masked,at:a.attempted_at};}
  return Response.json({enabled:settings.bookingApprovalEnabled===true,reviewer:settings.bookingApprovalReviewer||'owner',
  pending:rows.map((r:{details:string;[key:string]:unknown})=>{const {details,...rest}=r;return {...rest,details:JSON.parse(details)};}),
- pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
+ customFields:(settings.bookingCustomFields||[]).map((f:{id:string;label:string})=>({id:f.id,label:f.label})),pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
  }catch(e){return err(e);}}
 export async function POST(req:Request){if(!validOrigin(req))return Response.json({error:'Invalid origin'},{status:403,headers});
  try{
