@@ -18,18 +18,20 @@ export function sameClientContact(a,b){
 function freshClient(profile){
  return {id:profile.id,name:profile.name,email:profile.email||'',phone:profile.phone||'',notes:profile.notes||'',
   bookedSessions:0,attendedSessions:0,attendanceDays:[],serviceTypes:[],serviceNames:[],
-  latestDate:'',history:[],managed:true};
+  latestDate:'',history:[],firstBooking:null,latestBookingAnswers:[],managed:true};
 }
 function visitMetrics(client){
  const history=[...new Map(client.history.map(row=>[row.id,row])).values()];
  history.sort((a,b)=>b.date.localeCompare(a.date)||b.time-a.time);
  client.history=history;
- client.bookedSessions=history.filter(row=>!['Cancelled','No-show'].includes(row.status)).length;
+ client.bookedSessions=history.filter(row=>!['Cancelled','No-show','Pending approval','Declined'].includes(row.status)).length;
  client.attendedSessions=history.filter(row=>isAttended(row.status)).length;
  client.attendanceDays=[...new Set(history.filter(row=>isAttended(row.status)).map(row=>row.date).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
  client.serviceNames=[...new Set(history.flatMap(row=>row.serviceNames||[]))].sort((a,b)=>a.localeCompare(b));
  client.serviceTypes=[...new Set(history.flatMap(row=>row.serviceTypes||[]))].sort((a,b)=>a.localeCompare(b));
  client.latestDate=history[0]?.date||'';
+ client.firstBooking=[...history].sort((a,b)=>a.date.localeCompare(b.date)||a.time-b.time)[0]||null;
+ client.latestBookingAnswers=history.find(row=>row.answers?.length)?.answers||[];
  return client;
 }
 /** Attach persisted profile edits and manually-added customers to appointment-backed
