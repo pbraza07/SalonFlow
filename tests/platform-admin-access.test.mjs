@@ -14,7 +14,7 @@ test('v1.3.12 routes invalid/non-admin sessions to helpful pages instead of a mi
  assert.match(page,/Switch to administrator account/);assert.match(page,/api\/auth\/logout/);
  const login=await read('app/api/auth/login/route.ts');
  assert.match(login,/const role=await getPlatformRole\(pool,user.id\)/);
- assert.match(login,/const target=role\?'\/admin\/platform'/);
+ assert.match(login,/const target=user\.must_change_password===true\?'\/account\/require-password-change':role\?'\/admin\/platform'/);
  const dashboard=await read('app/studio/owner-dashboard.tsx');
  assert.match(dashboard,/isPlatformAdmin&&<a className="outline small" href="\/admin\/platform"/);
 });

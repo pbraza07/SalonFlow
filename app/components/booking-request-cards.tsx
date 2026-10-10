@@ -1,7 +1,8 @@
 'use client';
+import {Pencil} from 'lucide-react';
 export type BookingRequest={
  id:string;date:string;staff_id:string;start_minute:number;duration:number;reviewer:string;status:string;created_at:string;
- details:{customerName:string;customerEmail:string;customerPhone:string;services:string[];staffId:string;date:string;start:number;quotedPrice:number;customAnswers?:Record<string,string|boolean>;sessionId?:string|null};
+ details:{customerName:string;customerEmail:string;customerPhone:string;services:string[];staffId:string;date:string;start:number;quotedPrice:number;customAnswers?:Record<string,string|boolean>;sessionId?:string|null;customFieldLabels?:Record<string,string>;correctedAt?:string;correctedBy?:string;originalSubmission?:{customerName:string;customerEmail:string;customerPhone:string;customAnswers:Record<string,string|boolean>}};
  sessionInfo?:{id:string;booked:number;capacity:number;remaining:number;waiting:number}|null;
 };
 export const approvalTime=(minute:number)=>((Math.floor(minute/60)%12)||12)+':'+String(minute%60).padStart(2,'0')+(minute<720?' AM':' PM');
@@ -15,16 +16,16 @@ function receiptTime(iso:string){
 }
 const money=(value:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(value)||0);
 export default function BookingRequestCards({
- items,busy,onReview,team,customFields=[],approvalFields
+ items,busy,onReview,onEdit,team,customFields=[],approvalFields
 }:{
- items:BookingRequest[];busy:string;onReview:(id:string,accept:boolean)=>void;
+ items:BookingRequest[];busy:string;onReview:(id:string,accept:boolean)=>void;onEdit?:(item:BookingRequest)=>void;
  team?:{id:string;name:string}[];customFields?:{id:string;label:string}[];approvalFields?:string[];
 }){
  const visible=(id:string)=>approvalFields===undefined||approvalFields.includes(id);
  return <div className="sf-approval-list">{items.map(item=><article className="sf-approval-card" key={item.id}>
   <div className="sf-approval-title">
    <div><strong>{item.details.customerName||'New customer'}</strong><span>Requested {activityDate(item.date)} · {approvalTime(item.start_minute)} Eastern · {item.duration} minutes</span></div>
-   <span className="sf-request-badge">Awaiting review</span>
+   <span className="sf-request-badge">Awaiting review{item.details.correctedAt?' · Edited':''}</span>
   </div>
   <div className="sf-approval-activity" aria-label="Requested activity schedule">
    <div><small>Activity date</small><b>{activityDate(item.date)}</b></div>
@@ -45,6 +46,18 @@ export default function BookingRequestCards({
    {visible('quotedPrice')&&<div><small>Service quote</small><b>{money(item.details.quotedPrice||0)} <span className="sf-approval-unpaid">· No payment collected</span></b></div>}
    {visible('receivedAt')&&<div><small>Request received</small><b>{receiptTime(item.created_at)}</b></div>}
   </div>
-  <div className="sf-approval-buttons"><button type="button" className="primary" disabled={!!busy} onClick={()=>onReview(item.id,true)}>{busy===item.id?'Processing…':'Accept and add to calendar'}</button><button type="button" className="outline" disabled={!!busy} onClick={()=>onReview(item.id,false)}>Decline (no calendar change)</button></div>
+  <details className="sf-approval-all-submitted"><summary>View all customer-provided booking information</summary>
+   <div className="sf-approval-detail-grid">
+    <div><small>Name provided</small><b>{item.details.customerName}</b></div>
+    <div><small>Email provided</small><b>{item.details.customerEmail}</b></div>
+    <div><small>Phone provided</small><b>{item.details.customerPhone||'Not provided'}</b></div>
+    <div><small>Service(s)</small><b>{(item.details.services||[]).join(', ')}</b></div>
+    <div><small>Activity date and time</small><b>{activityDate(item.date)} · {approvalTime(item.start_minute)} Eastern</b></div>
+    <div><small>Quote</small><b>{money(item.details.quotedPrice||0)}</b></div>
+    {Object.entries(item.details.customAnswers||{}).map(([id,value])=><div key={id}><small>{item.details.customFieldLabels?.[id]||customFields.find(f=>f.id===id)?.label||id}</small><b>{typeof value==='boolean'?(value?'Yes':'No'):String(value)}</b></div>)}
+    {item.details.originalSubmission&&<div><small>Original customer name before any corrections</small><b>{item.details.originalSubmission.customerName}</b></div>}
+   </div>
+  </details>
+  <div className="sf-approval-buttons">{onEdit&&<button type="button" className="outline sf-booking-edit-button" disabled={!!busy} onClick={()=>onEdit(item)}><Pencil size={16}/> Edit booking details</button>}<button type="button" className="primary" disabled={!!busy} onClick={()=>onReview(item.id,true)}>{busy===item.id?'Processing…':'Accept and add to calendar'}</button><button type="button" className="outline" disabled={!!busy} onClick={()=>onReview(item.id,false)}>Decline (no calendar change)</button></div>
  </article>)}</div>;
 }

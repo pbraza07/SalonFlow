@@ -13,7 +13,7 @@ export async function POST(req:Request){
   const key=tokenHash(email.trim().toLowerCase());const pool=getPool();
   const rate=await pool.query("INSERT INTO login_attempts(key,count,window_start) VALUES($1,1,now()) ON CONFLICT(key) DO UPDATE SET count=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN 1 ELSE login_attempts.count+1 END, window_start=CASE WHEN login_attempts.window_start<now()-interval '15 minutes' THEN now() ELSE login_attempts.window_start END RETURNING count",[key]);
   if(rate.rows[0].count>10)return Response.json({error:'Too many attempts. Please wait 15 minutes.'},{status:429});
-  const user=(await pool.query('SELECT id,password_hash FROM users WHERE email=$1',[email.trim().toLowerCase()])).rows[0];
+  const user=(await pool.query('SELECT id,password_hash,must_change_password FROM users WHERE email=$1',[email.trim().toLowerCase()])).rows[0];
   if(!user||!verifyPassword(password,user.password_hash))return Response.json({error:'Email or password is incorrect.'},{status:401});
   const token=randomBytes(32).toString('hex');
   await pool.query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[tokenHash(token),user.id]);
@@ -21,7 +21,7 @@ export async function POST(req:Request){
   const business=(await pool.query("SELECT slug,status FROM businesses WHERE owner_id=$1 LIMIT 1",[user.id])).rows[0];
   // Resolve the platform role BEFORE the business route. The primary administrator also owns Crawford.
   const role=await getPlatformRole(pool,user.id);
-  const target=role?'/admin/platform':business?(business.status==='active'?dashboardPath(business.slug):'/registration-status'):'/';
+  const target=user.must_change_password===true?'/account/require-password-change':role?'/admin/platform':business?(business.status==='active'?dashboardPath(business.slug):'/registration-status'):'/';
   return Response.json({ok:true,dashboardUrl:target},{headers:{'Set-Cookie':cookie(token),'Cache-Control':'no-store'}});
  }catch(error){console.error('Login unavailable',error);return Response.json({error:'Sign-in is temporarily unavailable. Check the server database configuration.'},{status:503});}
 }

@@ -4,6 +4,7 @@ import {requireOwner} from '../../../../lib/auth';
 import {validOrigin,tokenHash,trustedOrigin} from '../../../../server/security.mjs';
 import {deliveryProviderStatus,notifyBookingRequest} from '../../../../server/notification-delivery.mjs';
 import {reviewPendingRequest} from '../../../../lib/booking-review-actions';
+import {editPendingRequest} from '../../../../server/booking-review-edits.mjs';
 import {approvalFieldsForBusiness,sessionReviewSummary} from '../../../../server/booking-approval-display.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store'};
@@ -26,13 +27,14 @@ export async function GET(req:Request){try{const {pool,owner,settings,business}=
  return Response.json({enabled:settings.bookingApprovalEnabled===true,reviewer:settings.bookingApprovalReviewer||'owner',
  pending:rows.map((r:any)=>({...r,sessionInfo:sessionReviewSummary(settings,r,confirmed,rows)})),
  approvalFields:approvalFieldsForBusiness(settings),
- customFields:(settings.bookingCustomFields||[]).map((f:{id:string;label:string})=>({id:f.id,label:f.label})),pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
+ customFields:(settings.bookingCustomFields||[]).map((f:{id:string;label:string;type:string;options?:string[];required:boolean})=>({id:f.id,label:f.label,type:f.type,options:f.options||[],required:f.required})),pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
  }catch(e){return err(e);}}
 export async function POST(req:Request){if(!validOrigin(req))return Response.json({error:'Invalid origin'},{status:403,headers});
  try{
   const {owner,pool,business,settings}=await context(req),raw=await req.text();
-  if(raw.length>2500)throw Error('Request too large.');
+  if(raw.length>25000)throw Error('Request too large.');
   const body=JSON.parse(raw);
+  if(body.action==='editBooking')return Response.json(await editPendingRequest(owner,String(body.id),'owner',body.details),{headers});
   if(body.action==='review'&&typeof body.accept==='boolean'){
    return Response.json(await reviewPendingRequest(owner,String(body.id), 'owner',body.accept),{headers});
   }

@@ -4,7 +4,7 @@ import styles from '../platform-pages.module.css';
 import {BUSINESS_INDUSTRIES} from '../../lib/business-options';
 import {googleMapsDirections,displayBusinessAddress} from '../../lib/maps';
 
-export type BusinessSummary={id:string;slug:string;name:string;industry:string;city:string;region:string;status:string;is_listed:boolean;created_at:string;owner_email:string;plan_code:string;appointment_count:number};
+export type BusinessSummary={id:string;slug:string;name:string;industry:string;description?:string;city:string;region:string;status:string;is_listed:boolean;created_at:string;owner_email:string;plan_code:string;appointment_count:number};
 type Client={name:string;email:string;visits:number;lastDate:string};
 type Appointment={id:string;date:string;start:number;duration:number;status:string;customerName:string;customerEmail:string;customerPhone:string;services:string[];quotedPrice:number;channel:string};
 type Term={id:string;service_name:string;duration_value:number;duration_unit:string;client_name:string;starts_on:string;ends_on:string;status:string};
@@ -29,10 +29,10 @@ export default function PlatformBusinessDirectory({businesses}:{businesses:Busin
  }
  return <section id="business-directory" className={styles.card}>
  <div className={styles.directoryHeading}><div><h2>All registered businesses</h2><p>Click a business to inspect its profile, services, team, customer records, and appointment history. Customer information is restricted to platform administrators.</p></div><span className={styles.directoryCount}>{listed.length} active / {businesses.length} total</span></div>
- <div className={styles.directoryControls}><label>Filter businesses<select aria-label="Business status filter" value={filter} onChange={e=>{setFilter(e.target.value);setChosen('');setDetail(null);}}><option value="all">All businesses</option><option value="listed">Approved · marketplace</option><option value="pending">Awaiting approval</option><option value="other">Declined / suspended</option></select></label><label>Find a business<input type="search" aria-label="Search registered businesses" placeholder="Name, owner, category, city…" value={search} onChange={e=>setSearch(e.target.value)}/></label></div>
+ <div className={styles.directoryControls}><label>Filter businesses<select aria-label="Business status filter" value={filter} onChange={e=>{setFilter(e.target.value);setChosen('');setDetail(null);}}><option value="all">All businesses</option><option value="listed">Approved · marketplace</option><option value="pending">Awaiting approval</option><option value="other">Declined / suspended / archived</option></select></label><label>Find a business<input type="search" aria-label="Search registered businesses" placeholder="Name, owner, category, city…" value={search} onChange={e=>setSearch(e.target.value)}/></label></div>
  <div className={styles.directoryGrid}>{shown.map(b=><button type="button" key={b.id} className={styles.directoryTile+' '+(chosen===b.id?styles.directoryTileSelected:'')} aria-expanded={chosen===b.id} onClick={()=>open(b.id)}>
- <span className={styles.directoryStatus}>{b.status==='active'?'Published':b.status==='pending'?'Pending approval':b.status==='rejected'?'Declined':'Suspended'}</span>
- <strong>{b.name}</strong><span>{readable(b.industry)}</span><small>{[b.city,b.region].filter(Boolean).join(', ')||'Location not provided'}</small>
+ <span className={styles.directoryStatus}>{b.status==='active'?'Published':b.status==='pending'?'Pending approval':b.status==='rejected'?'Declined':b.status==='archived'?'Archived':'Suspended'}</span>
+ <strong>{b.name}</strong><span>{readable(b.industry)}</span><small>Owner email: {b.owner_email}</small><small>{[b.city,b.region].filter(Boolean).join(', ')||'Location not provided'}</small>
  <span className={styles.directorySummary}>{b.appointment_count} appointments · {b.plan_code} plan</span><span className={styles.directoryOpen}>View business details ↗</span></button>)}</div>
  {!shown.length&&<p>No businesses match this filter.</p>}
  {chosen&&<div className={styles.directoryDetail} aria-live="polite">

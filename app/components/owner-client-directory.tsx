@@ -7,10 +7,12 @@ import {timeLabel} from '../../lib/defaults';
 type Visit={
  id:string;date:string;time:number;duration:number;serviceNames:string[];serviceTypes:string[];
  staff:string;status:string;attended:boolean;sessionType:string;quotedPrice:number;
+ answers?:{id:string;label:string;value:string|boolean}[];customerName?:string;customerEmail?:string;customerPhone?:string;
+ originalSubmission?:{customerName:string;customerEmail:string;customerPhone:string;customAnswers?:Record<string,string|boolean>}|null;submittedAt?:string|null;policyAccepted?:boolean;policyAcceptedAt?:string|null;
 };
 type Client={
  id:string;name:string;email:string;phone:string;bookedSessions:number;attendedSessions:number;
- attendanceDays:string[];serviceTypes:string[];serviceNames:string[];latestDate:string;history:Visit[];notes?:string;managed?:boolean;
+ attendanceDays:string[];serviceTypes:string[];serviceNames:string[];latestDate:string;history:Visit[];notes?:string;managed?:boolean;firstBooking?:Visit|null;latestBookingAnswers?:{id:string;label:string;value:string|boolean}[];
 };
 const humanDate=(date:string)=>date?new Date(date+'T12:00:00Z').toLocaleDateString('en-US',
  {month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}):'—';
@@ -107,6 +109,25 @@ export default function OwnerClientDirectory({onBook}:{onBook:()=>void}){
      <div><h3>{selected.name}</h3><p>{selected.email||'No email recorded'}{selected.phone?' · '+selected.phone:''}</p>
       <span className="sf-client-profile-note">Service history and attendance for this business only</span></div>
     </div>
+    {selected.firstBooking&&<section className="sf-client-first-booking">
+     <div className="sf-client-history-heading"><h3>First booking information</h3><small>Copied from the original customer booking request</small></div>
+     <div className="sf-client-first-details">
+      <div><small>Customer name</small><b>{selected.firstBooking.originalSubmission?.customerName||selected.firstBooking.customerName||selected.name}</b></div>
+      <div><small>Email provided</small><b>{selected.firstBooking.originalSubmission?.customerEmail||selected.firstBooking.customerEmail||selected.email}</b></div>
+      <div><small>Phone provided</small><b>{selected.firstBooking.originalSubmission?.customerPhone||selected.firstBooking.customerPhone||'Not provided'}</b></div>
+      <div><small>Activity date & time</small><b>{humanDate(selected.firstBooking.date)} · {timeLabel(selected.firstBooking.time)} Eastern</b></div>
+      <div><small>Service(s)</small><b>{selected.firstBooking.serviceNames.join(', ')||'Not specified'}</b></div>
+      <div><small>Service type(s)</small><b>{selected.firstBooking.serviceTypes.join(', ')||'Not specified'}</b></div>
+      <div><small>Staff / team</small><b>{selected.firstBooking.staff||'Not specified'}</b></div>
+      <div><small>Requested booking status</small><b>{selected.firstBooking.status}</b></div>
+      <div><small>Price quoted</small><b>{money(selected.firstBooking.quotedPrice)}</b></div>
+      <div><small>Request received</small><b>{selected.firstBooking.submittedAt?new Date(selected.firstBooking.submittedAt).toLocaleString('en-US',{timeZone:'America/New_York'}):'Not available'}</b></div>
+      <div><small>Booking policy consent</small><b>{selected.firstBooking.policyAccepted?'Accepted':'Not recorded'}</b></div>
+     </div>
+     {!!selected.firstBooking.answers?.length&&<div className="sf-client-original-answers"><h4>Initial booking questions and answers</h4>
+      {selected.firstBooking.answers.map(answer=><div key={answer.id}><small>{answer.label}</small><b>{String(selected.firstBooking?.originalSubmission?.customAnswers?.[answer.id]??answer.value)}</b></div>)}
+     </div>}
+    </section>}
     <div className="sf-client-metrics">
      <div><small>Sessions booked</small><strong>{selected.bookedSessions}</strong></div>
      <div><small>Sessions attended</small><strong>{selected.attendedSessions}</strong></div>
@@ -116,6 +137,9 @@ export default function OwnerClientDirectory({onBook}:{onBook:()=>void}){
     <div className="sf-client-service-panel"><h4>Service types utilized</h4><div className="sf-client-tags">{selected.serviceTypes.length?selected.serviceTypes.map(type=><span key={type}>{type}</span>):<small>No current service type recorded</small>}</div>
      <h4>Services utilized</h4><div className="sf-client-tags">{selected.serviceNames.length?selected.serviceNames.map(name=><span key={name}>{name}</span>):<small>No services recorded</small>}</div>
     </div>
+    {!!selected.latestBookingAnswers?.length&&<section className="sf-client-first-booking sf-client-last-answers"><h4>Latest booking answers</h4>
+     <div className="sf-client-original-answers">{selected.latestBookingAnswers.map(answer=><div key={answer.id}><small>{answer.label}</small><b>{String(answer.value)}</b></div>)}</div>
+    </section>}
     {selected.notes&&<div className="sf-client-private-notes"><h4>Private business notes</h4><p>{selected.notes}</p></div>}
     <div className="sf-client-attendance"><h4>Days attended <span>({selected.attendanceDays.length})</span></h4>
      {selected.attendanceDays.length?<div className="sf-client-day-tags">{selected.attendanceDays.map(day=><time dateTime={day} key={day}>{humanDate(day)}</time>)}</div>:<p>Attendance is recorded when an appointment is marked <strong>Checked in</strong> or <strong>Completed</strong>.</p>}
@@ -129,7 +153,9 @@ export default function OwnerClientDirectory({onBook}:{onBook:()=>void}){
      <thead><tr><th>Activity date / time</th><th>Service used</th><th>Service type</th><th>Session</th><th>Team</th><th>Status</th><th>Quote</th></tr></thead>
      <tbody>{visited.map(v=><tr key={v.id}>
       <td><b>{humanDate(v.date)}</b><small>{timeLabel(v.time)} Eastern</small></td>
-      <td>{v.serviceNames.join(', ')||'Unspecified'}</td><td>{v.serviceTypes.join(', ')||'Not categorized'}</td>
+      <td>{v.serviceNames.join(', ')||'Unspecified'}{!!v.answers?.length&&<details className="sf-client-visit-answers"><summary>Booking answers ({v.answers.length})</summary>
+       {v.answers.map(a=><div key={a.id}><strong>{a.label}:</strong> {String(a.value)}</div>)}
+      </details>}</td><td>{v.serviceTypes.join(', ')||'Not categorized'}</td>
       <td>{v.sessionType}</td><td>{v.staff||'—'}</td>
       <td><span className={'sf-client-visit-status '+(v.attended?'attended':v.status==='No-show'||v.status==='Cancelled'?'missed':'scheduled')}>{v.status}{v.attended?' · Attended':''}</span></td>
       <td>{money(v.quotedPrice)}</td>
@@ -140,6 +166,7 @@ export default function OwnerClientDirectory({onBook}:{onBook:()=>void}){
    {filtered.length?<div className="sf-client-directory-grid">{filtered.map(c=><article className="sf-client-summary" key={c.id}>
     <div className="sf-client-summary-top"><span className="sf-client-avatar" aria-hidden="true">{c.name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase()}</span><div><h3>{c.name}</h3><p>{c.email||c.phone||'Contact not provided'}</p></div></div>
     <div className="sf-client-summary-metrics"><span><b>{c.bookedSessions}</b> sessions booked</span><span><b>{c.attendedSessions}</b> attended</span><span><b>{c.attendanceDays.length}</b> attendance days</span></div>
+    {!!c.latestBookingAnswers?.length&&<p className="sf-client-booking-answer-preview">{c.latestBookingAnswers.length} booking question{c.latestBookingAnswers.length===1?'':'s'} answered · See full details</p>}
     <div className="sf-client-summary-types"><small>Service types</small><strong>{c.serviceTypes.join(' · ')||'Not categorized'}</strong></div>
     <p className="sf-client-last-visit"><CalendarDays size={14}/> Latest appointment: {humanDate(c.latestDate)}</p>
     <div className="sf-client-summary-actions"><button type="button" className="primary" onClick={()=>{setSelectedId(c.id);setAttendedOnly(false);}}><ChevronRight size={16}/> View history</button>
