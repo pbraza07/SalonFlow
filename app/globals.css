@@ -1072,3 +1072,27 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
  .sf-platform-confirm>div>button{flex:1}
  .sf-platform-business-actions button{flex:1 1 46%}
 }
+
+
+/* v1.3.22: secure primary administrator credential recovery and forced rotation */
+.sf-admin-password-display{display:flex;gap:7px;align-items:center}
+.sf-admin-password-display input{flex:1;min-width:0;font-size:13px}
+.sf-admin-password-display>button{width:43px;min-width:43px;height:43px;display:inline-flex;justify-content:center;align-items:center;padding:0}
+.sf-platform-business-row>div:first-child>small b{font-size:11px;color:var(--brand-primary,#123f3a)}
+.sf-password-reset-page{box-sizing:border-box;display:flex;justify-content:center;align-items:center;min-height:100dvh;padding:25px 15px;background:var(--brand-background,#f6f5ee);font-family:var(--sf-body-font,Arial,sans-serif);color:var(--brand-ink,#123f3a)}
+.sf-password-reset-card{width:min(100%,550px);padding:clamp(23px,4vw,38px);background:var(--brand-surface,#fff);border:1px solid var(--brand-border,#cadae0);border-radius:19px;box-shadow:0 17px 55px rgba(16,49,37,.08);min-width:0}
+.sf-reset-symbol{display:flex;justify-content:center;align-items:center;width:59px;height:59px;border-radius:14px;margin-bottom:20px;background:var(--brand-selected,#e9f0e8);color:var(--brand-primary,#123f3a)}
+.sf-password-reset-card>span{display:block;font-size:10px;font-weight:800;letter-spacing:.13em;color:var(--brand-primary,#123f3a)}
+.sf-password-reset-card h1{font-size:clamp(22px,4vw,32px);font-family:var(--sf-heading-font,Arial,sans-serif);color:var(--brand-primary,#123f3a);line-height:1.2;margin:10px 0}
+.sf-password-reset-card>p{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.7;color:var(--brand-ink,#123f3a);margin:12px 0 18px}
+.sf-password-reset-card form{display:grid;gap:15px}
+.sf-password-reset-card form label{display:grid;gap:7px;font-weight:700;font-size:12px;color:var(--brand-ink,#123f3a)}
+.sf-password-reset-card form input{width:100%;max-width:100%;box-sizing:border-box;min-height:45px;border:1px solid var(--brand-border,#b8ccbc);border-radius:9px;padding:11px 13px;background:#fff;color:#1c3830;font-size:14px}
+.sf-password-reset-card :is(button.primary,a.primary){min-height:47px;border-radius:9px;padding:12px 16px;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;color:#fff;background:var(--brand-primary,#123f3a);font-weight:800;font-size:13px;border:0;cursor:pointer}
+.sf-password-reset-card form button:disabled{opacity:.6;cursor:wait}
+.sf-password-reset-card small{display:block;margin-top:17px;font-size:11px;line-height:1.6;color:var(--brand-muted,#5d6d63)}
+.sf-password-reset-error{font-size:12px;color:#8b2828;border-left:3px solid #af493a;background:#fff0ec;padding:12px;border-radius:8px;margin:0}
+@media(max-width:520px){
+ .sf-password-reset-card{padding:22px}
+ .sf-platform-confirm>div button{flex:1}
+}
