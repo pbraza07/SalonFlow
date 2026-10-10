@@ -12,7 +12,7 @@ export async function GET(req:Request){
    "SELECT b.slug,b.name,b.brand_primary,b.brand_background,s.data FROM businesses b LEFT JOIN settings s ON s.owner=b.owner_id WHERE b.slug=$1 AND b.status='active'",
    [slug])).rows[0];
   if(!row)return Response.json({error:'Unknown business.'},{status:404,headers:{'Cache-Control':'no-store'}});
-  let raw={};try{raw=JSON.parse(row.data||'{}')}catch{}
+  let raw:{theme?:unknown}={};try{raw=JSON.parse(row.data||'{}')}catch{}
   const theme=resolveTheme(raw.theme,row.brand_primary,row.brand_background);
   return new Response(JSON.stringify(businessManifest(row.slug,row.name,theme)),{
    headers:{'Content-Type':'application/manifest+json; charset=utf-8',
