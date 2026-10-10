@@ -43,8 +43,6 @@ export async function POST(req:Request){
    if(!result.rowCount)return Response.json({error:'Pending business application not found.'},{status:404});
    return Response.json({ok:true,slug:result.rows[0].slug,status:b.approve?'active':'rejected',listed:b.approve},{headers:{'Cache-Control':'no-store'}});
   }
-  const result=await pool.query('UPDATE businesses SET is_listed=$1,listing_requested=FALSE,updated_at=now() WHERE id=$2 AND status=$3 RETURNING slug',[b.approve,b.businessId,'active']);
-  if(!result.rowCount)return Response.json({error:'Business not found.'},{status:404});
-  return Response.json({ok:true,slug:result.rows[0].slug,listed:b.approve},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({error:'Approved businesses are published automatically. Listing cannot be disabled for active businesses.'},{status:400,headers:{'Cache-Control':'no-store'}});
  }catch(e){return err(e);}
 }
