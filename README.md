@@ -1,3 +1,11 @@
+# SelahFlow v1.3.9 — Appointment review notifications
+
+The business owner can enable booking approvals in Dashboard → Settings, designate themselves or a team member reviewer, and set simultaneous booking slot limits for every service. Incoming requests appear in the dashboard while it is open; an authorized staff reviewer may receive a private 30-day link for the dedicated review inbox. Pending online requests do **not** reserve times, appear as confirmed appointments, or collect payment. After acceptance, appointment and staff calendar slots are saved transactionally after conflict checks. A decline creates no calendar booking.
+
+The business registration dropdown is now alphabetized by category label.
+
+See docs/RELEASE_v1.3.9_BOOKING_APPROVALS.md for complete behavior and safeguards.
+
 # SelahFlow Studio v1.3.8 — Business marketplace and administrator directory
 
 All **approved, active** businesses are discoverable at `/discover`. Database migration 006 publishes previously unlisted active businesses; businesses still pending registration, declined or suspended remain private.

@@ -1,3 +1,15 @@
+# v1.3.9 acceptance tests
+- npm ci; npm run typecheck; npm test; npm run build
+- Check /signup business categories sorted alphabetically by displayed label.
+- Owner Settings: enable approval toggle, reviewer owner/staff, service slot limits 1–20. Save and refresh.
+- When approval disabled, online bookings confirm immediately. When enabled, online bookings return pending and no appointment or calendar slots are created yet.
+- Owner receives an in-app pending request within 20s, accepts and sees appointment on calendar; declines create no appointment.
+- Staff review link is private, 30-day, revocable; only staff assigned to that reviewer ID can view/accept booking requests.
+- Acceptance checks current team availability, business hours, and simultaneous service slot limits atomically. Concurrent requests for the same time cannot double-book a team member; on conflict keep request pending.
+- Check duplicate request idempotency and preserve existing appointments from earlier releases.
+- Confirm customer sees pending notice and not false booking confirmation.
+- Verify Render migration 007 and service status live.
+
 # v1.3.8 Release checks
 - npm ci; npm run typecheck; npm test; npm run build.
 - Migration 006 lists all preexisting active businesses without listing pending, rejected or suspended businesses.
