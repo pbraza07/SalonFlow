@@ -62,10 +62,10 @@ test('membership migration isolates each merchant, keeps ongoing payments linked
   await db.query("INSERT INTO users(id,email,password_hash) VALUES('u1','first@example.com','hash'),('u2','second@example.com','hash')");
   await db.query("INSERT INTO businesses(id,owner_id,slug,name) VALUES('b1','u1','business-one','Business One'),('b2','u2','business-two','Business Two')");
   await db.query("INSERT INTO membership_plans(id,business_id,name,interval_unit,price_cents) VALUES('plan1','b1','Monthly Pass','month',4900),('plan2','b2','Monthly Pass','month',4900)");
-  await db.query("INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,stripe_account_id) VALUES('m1','b1','plan1','Alex','alex@example.com','acct_a')");
+  await db.query("INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,stripe_account_id,price_cents) VALUES('m1','b1','plan1','Alex','alex@example.com','acct_a',4900)");
   assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM customer_memberships WHERE business_id=$1',['b1'])).rows[0].n,1);
   assert.equal((await db.query('SELECT COUNT(*)::int AS n FROM customer_memberships WHERE business_id=$1',['b2'])).rows[0].n,0);
-  await assert.rejects(db.query("INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,stripe_account_id) VALUES('m3','b2','no-plan','Alex','alex@example.com','acct_b')"));
+  await assert.rejects(db.query("INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,stripe_account_id,price_cents) VALUES('m3','b2','no-plan','Alex','alex@example.com','acct_b',4900)"));
   await db.query("INSERT INTO membership_webhook_events(event_id,stripe_account_id,event_type) VALUES('evt_1','acct_a','invoice.paid') ON CONFLICT DO NOTHING");
   const duplicate=await db.query("INSERT INTO membership_webhook_events(event_id,stripe_account_id,event_type) VALUES('evt_1','acct_a','invoice.paid') ON CONFLICT DO NOTHING RETURNING event_id");
   assert.equal(duplicate.rowCount,0);
