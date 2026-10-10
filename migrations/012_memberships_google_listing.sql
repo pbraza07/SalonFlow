@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS customer_memberships (
  id TEXT PRIMARY KEY,
  business_id TEXT NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
  plan_id TEXT NOT NULL REFERENCES membership_plans(id),
+ price_cents INTEGER NOT NULL CHECK(price_cents>=100 AND price_cents<=100000000),
  customer_name TEXT NOT NULL CHECK(length(trim(customer_name)) BETWEEN 2 AND 100),
  customer_email TEXT NOT NULL CHECK(length(trim(customer_email))<=254),
  status TEXT NOT NULL DEFAULT 'pending_payment'
