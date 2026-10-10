@@ -489,3 +489,263 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
  .sf-approval-detail-grid,.sf-settings-form .sf-approval-field-choices{grid-template-columns:minmax(0,1fr)}
  .sf-approval-buttons button{width:100%}
 }
+
+
+/* v1.3.20: Apply each owner's chosen palette and font to the compact Settings UI. */
+.app-shell[data-selah-theme] .sf-settings-form {
+ --sf-settings-ink:var(--sf-on-surface);
+ --sf-settings-muted:var(--sf-on-surface);
+ --sf-settings-line:var(--sf-border);
+ --sf-settings-soft:var(--sf-selected);
+ font-family:var(--sf-body-font);
+}
+.app-shell[data-selah-theme] .sf-settings-intro {
+ background:var(--sf-hero)!important;
+ color:var(--sf-on-hero)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-intro :is(h2,p,span,svg),
+.app-shell[data-selah-theme] .sf-settings-status :is(span,svg),
+.app-shell[data-selah-theme] .sf-settings-eyebrow {
+ color:var(--sf-on-hero)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-intro h2 {font-family:var(--sf-heading-font)!important}
+.app-shell[data-selah-theme] .sf-settings-nav {
+ background:var(--sf-surface)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-nav .sf-settings-nav-item {
+ background:transparent!important;
+ color:var(--sf-on-surface)!important;
+ border-color:transparent!important;
+ font-family:var(--sf-body-font)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-nav .sf-settings-nav-item :is(b,small,svg) {
+ color:inherit!important;
+ opacity:1!important;
+}
+.app-shell[data-selah-theme] .sf-settings-nav .sf-settings-nav-item small {opacity:.8!important}
+.app-shell[data-selah-theme] .sf-settings-nav .sf-settings-nav-item.active {
+ background:var(--sf-selected)!important;
+ color:var(--sf-on-selected)!important;
+ border-color:var(--sf-border)!important;
+ box-shadow:inset 3px 0 var(--sf-accent)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-nav .sf-settings-nav-item:hover:not(.active) {
+ background:var(--sf-secondary-button)!important;
+ color:var(--sf-on-secondary-button)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-section-heading :is(h3,p,span) {
+ color:var(--sf-heading-on-page)!important;
+ opacity:1!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card {
+ background:var(--sf-surface)!important;
+ color:var(--sf-on-surface)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card :is(h2,h3,label,p,span,small),
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card .muted {
+ color:var(--sf-on-surface)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card :is(h2,h3) {
+ font-family:var(--sf-heading-font)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-custom-field,
+.app-shell[data-selah-theme] .sf-settings-form .sf-approval-field-preferences,
+.app-shell[data-selah-theme] .sf-settings-form .sf-session-editor {
+ background:var(--sf-step)!important;
+ color:var(--sf-on-step)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-custom-field :is(label,p,span,small),
+.app-shell[data-selah-theme] .sf-settings-form .sf-approval-field-preferences :is(h3,label,p,span,small),
+.app-shell[data-selah-theme] .sf-settings-form .sf-session-editor :is(label,p,span,small) {
+ color:var(--sf-on-step)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-approval-field-choices .sf-approval-field-toggle {
+ background:var(--sf-card)!important;
+ color:var(--sf-on-card)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-approval-field-choices .sf-approval-field-toggle span {
+ color:var(--sf-on-card)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-booking-rule {
+ background:var(--sf-policy)!important;
+ color:var(--sf-on-policy)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-booking-rule :is(strong,p,small,svg) {
+ color:var(--sf-on-policy)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-session-editor .sf-session-capacity {
+ background:var(--sf-card)!important;
+ color:var(--sf-on-card)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-session-editor .sf-session-capacity :is(b,span) {
+ color:var(--sf-on-card)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-save {
+ background:var(--sf-surface)!important;
+ color:var(--sf-on-surface)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-save .muted,
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-save .muted svg {
+ color:var(--sf-on-surface)!important;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card label :is(input,select,textarea) {
+ font-size:13px;
+}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-nav-item b {font-size:13px}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-nav-item small {font-size:11px}
+.app-shell[data-selah-theme] .sf-settings-form .sf-settings-card label {font-size:13px}
+/* Explicit contrast for the formerly hard-coded approval review cards. */
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-card {
+ background:var(--sf-card)!important;
+ color:var(--sf-on-card)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-card .sf-approval-title :is(strong,span),
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-card .sf-approval-title {
+ color:var(--sf-on-card)!important;
+}
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-activity,
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-seats {
+ background:var(--sf-step)!important;
+ color:var(--sf-on-step)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-activity :is(b,small),
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-seats :is(b,strong,span,small) {
+ color:var(--sf-on-step)!important;
+}
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-detail-grid>div {
+ background:var(--sf-surface)!important;
+ color:var(--sf-on-surface)!important;
+ border-color:var(--sf-border)!important;
+}
+.app-shell[data-selah-theme] .sf-approval-inbox .sf-approval-detail-grid :is(b,small,span) {
+ color:var(--sf-on-surface)!important;
+}
+.app-shell[data-selah-theme] .sf-request-badge {
+ background:var(--sf-selected)!important;color:var(--sf-on-selected)!important
+}
+.app-shell[data-selah-theme] .sf-approval-capacity-track {background:var(--sf-secondary-button)!important}
+.app-shell[data-selah-theme] .sf-approval-capacity-track>span {background:var(--sf-accent)!important}
+.sf-device-app-label {
+ padding:7px 10px;max-width:100%;overflow-wrap:anywhere;
+ border-left:3px solid var(--sf-accent,#C6A66A);
+ background:var(--sf-step,#eef3ed);color:var(--sf-on-step,#223b2f);
+ border-radius:0 7px 7px 0;font-size:12px;line-height:1.5;
+}
+.app-shell[data-selah-theme] .sf-device-app-label :is(b,span) {color:var(--sf-on-step)!important}
+/* Client directory, status chips and personalized service history */
+.sf-clients-page {
+ width:100%;max-width:1460px;margin:0 auto;min-width:0;
+ font-family:var(--sf-body-font,Arial,sans-serif);
+ color:var(--sf-heading-on-page);
+}
+.sf-clients-page :is(button,a){font-family:var(--sf-body-font,Arial,sans-serif)}
+.sf-clients-heading {display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}
+.sf-clients-heading h2 {font-size:clamp(20px,2.5vw,27px);line-height:1.3;margin:4px 0 8px;color:var(--sf-heading-on-page)!important;font-family:var(--sf-heading-font)}
+.sf-clients-heading p {font-size:13px;max-width:780px;line-height:1.6;color:var(--sf-text-readable)!important;margin:0}
+.sf-clients-eyebrow {font-size:10px;letter-spacing:.13em;font-weight:800;color:var(--sf-link-readable)}
+.sf-clients-actions,.sf-client-detail-nav {display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.sf-clients-actions :is(button,a),.sf-client-detail-nav :is(button,a) {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 14px;border-radius:9px;font-size:13px}
+.sf-clients-export {text-decoration:none!important}
+.sf-clients-stats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:17px 0 22px}
+.sf-clients-stats>div {
+ display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 9px;
+ align-items:center;background:var(--sf-surface);color:var(--sf-on-surface);
+ border:1px solid var(--sf-border);border-radius:13px;padding:15px 17px;
+}
+.sf-clients-stats svg {grid-row:1/3;color:var(--sf-link-on-surface);width:23px}
+.sf-clients-stats small {font-size:11px;color:var(--sf-on-surface)!important}
+.sf-clients-stats strong {font-size:24px;color:var(--sf-on-surface);line-height:1.3}
+.sf-clients-search {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:12px 0}
+.sf-clients-search label {
+ display:flex;gap:10px;align-items:center;min-width:0;flex:1;
+ background:var(--sf-input);color:var(--sf-on-input);
+ border:1px solid var(--sf-border);border-radius:10px;padding:0 12px;max-width:700px;
+}
+.app-shell[data-selah-theme] .sf-clients-search label input {
+ border:0!important;background:transparent!important;color:var(--sf-on-input)!important;
+ width:100%;min-width:0;min-height:45px;box-shadow:none!important;outline:none!important;
+}
+.sf-clients-search small {font-size:12px;color:var(--sf-text-readable)}
+.sf-client-directory-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,295px),1fr));gap:15px;margin:18px 0}
+.sf-client-summary,.sf-client-profile,.sf-client-history {
+ background:var(--sf-surface)!important;color:var(--sf-on-surface)!important;
+ border:1px solid var(--sf-border)!important;border-radius:13px;padding:19px;min-width:0;
+}
+.sf-client-summary-top {display:flex;align-items:center;gap:12px;margin-bottom:13px;min-width:0}
+.sf-client-summary-top>div {min-width:0}
+.sf-client-summary-top h3,.sf-client-profile h3 {
+ font-family:var(--sf-heading-font)!important;font-size:17px;margin:0 0 4px;
+ color:var(--sf-on-surface)!important;overflow-wrap:anywhere;
+}
+.sf-client-summary-top p,.sf-client-profile p {margin:0;font-size:12px;color:var(--sf-on-surface)!important;overflow-wrap:anywhere}
+.sf-client-avatar {
+ display:inline-flex;align-items:center;justify-content:center;flex:0 0 47px;
+ width:47px;height:47px;border-radius:13px;background:var(--sf-selected);color:var(--sf-on-selected);
+ font-weight:800;font-size:14px;
+}
+.sf-client-summary-metrics {
+ display:flex;flex-wrap:wrap;gap:7px;margin:13px 0;
+}
+.sf-client-summary-metrics span {border-radius:7px;padding:8px;background:var(--sf-step);color:var(--sf-on-step);font-size:11px;line-height:1.4}
+.sf-client-summary-metrics b {font-size:14px;color:inherit}
+.sf-client-summary-types {padding:10px 0;border-top:1px solid var(--sf-border)}
+.sf-client-summary-types small {display:block;font-size:11px;margin-bottom:5px;color:var(--sf-on-surface)!important}
+.sf-client-summary-types strong {font-size:12px;color:var(--sf-on-surface);font-weight:700;overflow-wrap:anywhere}
+.sf-client-last-visit {display:flex;gap:7px;align-items:center;font-size:11px;margin:10px 0 16px;color:var(--sf-on-surface)!important}
+.sf-client-summary-actions {display:flex;flex-wrap:wrap;gap:8px}
+.sf-client-summary-actions :is(button,a) {display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:43px;padding:9px 12px;border-radius:8px;font-size:12px}
+.sf-client-profile-heading {display:flex;gap:13px;align-items:center;flex-wrap:wrap}
+.sf-client-profile-heading h3 {font-size:22px}
+.sf-client-profile-note {font-size:11px;color:var(--sf-on-surface)}
+.sf-client-detail-nav {margin:12px 0 15px;justify-content:space-between}
+.sf-client-metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
+.sf-client-metrics>div {padding:12px;background:var(--sf-step);color:var(--sf-on-step);border-radius:9px}
+.sf-client-metrics small {display:block;font-size:11px;color:inherit!important}
+.sf-client-metrics strong {display:block;font-size:21px;margin-top:4px}
+.sf-client-service-panel,.sf-client-attendance {padding:12px 0;border-top:1px solid var(--sf-border)}
+.sf-client-profile h4 {color:var(--sf-on-surface)!important;font-size:13px;margin:11px 0}
+.sf-client-tags,.sf-client-day-tags {display:flex;flex-wrap:wrap;gap:8px;margin-bottom:11px}
+.sf-client-tags span,.sf-client-day-tags time {
+ padding:8px 11px;border:1px solid var(--sf-border);border-radius:999px;
+ background:var(--sf-secondary-button);color:var(--sf-on-secondary-button);font-size:12px;
+}
+.sf-client-attendance p {font-size:12px;color:var(--sf-on-surface)!important}
+.sf-client-history {margin-top:14px}
+.sf-client-history-heading {display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:13px}
+.sf-client-history-heading h3 {font-family:var(--sf-heading-font);font-size:17px;color:var(--sf-on-surface)!important;margin:0 0 5px}
+.sf-client-history-heading p {margin:0;font-size:12px;color:var(--sf-on-surface)!important}
+.sf-client-history-filter {display:flex;align-items:center;gap:9px;font-size:12px;white-space:nowrap;color:var(--sf-on-surface)!important}
+.sf-client-history-filter input {accent-color:var(--sf-button)}
+.sf-client-history-scroll {overflow-x:auto;max-width:100%;border:1px solid var(--sf-border);border-radius:9px}
+.sf-client-history-table {width:100%;min-width:900px;border-collapse:collapse}
+.sf-client-history-table th {font-size:11px;padding:11px;text-align:left}
+.sf-client-history-table td {padding:12px;font-size:12px;border-bottom:1px solid var(--sf-border);color:var(--sf-on-surface)!important}
+.sf-client-history-table td small {display:block;margin-top:4px;font-size:11px;color:var(--sf-on-surface)!important}
+.sf-client-visit-status {display:inline-flex;white-space:nowrap;font-size:11px;font-weight:700;padding:5px 9px;border-radius:6px;background:var(--sf-secondary-button);color:var(--sf-on-secondary-button)}
+.sf-client-visit-status.attended {background:var(--sf-selected);color:var(--sf-on-selected)}
+.sf-client-empty {padding:30px;text-align:center;display:grid;justify-items:center;gap:12px;border:1px dashed var(--sf-border);border-radius:13px;color:var(--sf-text-readable)}
+.sf-client-empty h3 {margin:0;font-size:18px;color:var(--sf-heading-on-page)}
+.sf-client-empty p {margin:0;font-size:13px;line-height:1.6}
+@media(max-width:760px){
+ .sf-clients-actions,.sf-client-detail-nav {width:100%}
+ .sf-clients-actions>* {flex:1}
+ .sf-clients-stats {grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sf-client-metrics {grid-template-columns:repeat(2,minmax(0,1fr))}
+ .sf-clients-heading p {font-size:12px}
+}
+@media(max-width:440px){
+ .sf-clients-stats {grid-template-columns:minmax(0,1fr)}
+ .sf-clients-actions>* {flex:1 1 100%}
+ .sf-client-summary {padding:15px}
+ .sf-client-summary-actions>* {flex:1}
+}
