@@ -1,6 +1,6 @@
 import {db} from './database';
 import {getPool} from '../server/database.mjs';
-import {bookingDateRange,computeDayAvailability,selectedSession,validateBookableSessions,validateExistingSessionReservations} from '../server/session-scheduling.mjs';
+import {appointmentData,overlaps,bookingDateRange,computeDayAvailability,selectedSession,validateBookableSessions,validateExistingSessionReservations} from '../server/session-scheduling.mjs';
 import {validateBookingFields,sanitizeBookingAnswers} from '../server/booking-custom-fields.mjs';
 import {requireOwner} from './auth';
 import {tokenHash,validOrigin,trustedOrigin} from '../server/security.mjs';
@@ -52,6 +52,18 @@ try{
   "SELECT data,status FROM appointments WHERE owner=$1 AND status NOT IN ('Cancelled','No-show') AND data LIKE '%sessionId%'",
   [owner])).rows;
  validateExistingSessionReservations(oldConfig.bookableSessions||[],c.bookableSessions||[],reservationRows);
+
+ const existingSchedules=(await client.query(
+  "SELECT date,staff,start,duration,status,data FROM appointments WHERE owner=$1 AND status NOT IN ('Cancelled','No-show')",
+  [owner])).rows;
+ for(const session of c.bookableSessions||[]){
+  const service=c.services.find((x:any)=>x.id===session.service);
+  if(existingSchedules.some((a:any)=>a.date===session.date&&a.staff===session.staff&&
+   appointmentData(a).sessionId!==session.id&&
+   overlaps(session.start,service.duration+c.buffer,Number(a.start),Number(a.duration)+c.buffer)))
+   throw Error('This session overlaps a confirmed appointment for the selected team member.');
+ }
+
  for(const session of oldConfig.bookableSessions||[]){
   if(!reservationRows.some((a:any)=>{try{return JSON.parse(a.data).sessionId===session.id}catch{return false}}))continue;
   const previousDuration=oldConfig.services.find((x:any)=>x.id===session.service)?.duration;
