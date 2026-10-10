@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {
  validateBookableSessions,validateExistingSessionReservations,bookedSessionCount,
- sessionRemaining,bookingDateRange,computeDayAvailability
+ sessionRemaining,bookingDateRange,computeDayAvailability,easternClock,nextQuarterHour
 } from '../server/session-scheduling.mjs';
 import {confirmBooking,serviceCapacityOpen} from '../server/booking-approvals.mjs';
 
@@ -86,4 +86,47 @@ test('atomic confirmation serializes concurrent customers and cannot oversell se
   await confirmBooking(options('customer-12'));
   assert.equal((await db.query("SELECT COUNT(*)::int AS count FROM appointments WHERE status='Confirmed'")).rows[0].count,10);
  }finally{await db.close();}
+});
+
+test('today availability starts at the next 15-minute mark, never an arbitrary hour away',()=>{
+ const empty={...config,bookableSessions:[]};
+ for(const [now,expected] of [[700,705],[704,705],[705,720],[719,720],[720,735]]){
+  const day=computeDayAvailability({config:empty,date,staff:'coach',services:[training],
+    appointments:[],reservedSlots:[],today:date,nowMinutes:now,capacityOpen:serviceCapacityOpen});
+  assert.equal(day.earliestStart,expected);
+  assert.equal(day.firstAvailable,expected);
+  assert.equal(day.slots[0],expected);
+  assert.ok(expected>now&&expected-now<=15);
+ }
+ assert.equal(nextQuarterHour(700),705);
+ assert.equal(nextQuarterHour(719),720);
+ assert.equal(nextQuarterHour(1439),1440);
+});
+test('Eastern Time is correct in daylight time and standard time regardless of server timezone',()=>{
+ assert.deepEqual(easternClock(new Date('2026-10-10T15:40:00.000Z')),{date:'2026-10-10',minutes:700});
+ assert.deepEqual(easternClock(new Date('2026-01-10T16:40:00.000Z')),{date:'2026-01-10',minutes:700});
+ assert.deepEqual(easternClock(new Date('2026-10-11T03:40:00.000Z')),{date:'2026-10-10',minutes:1420});
+});
+test('existing appointments may delay the first genuinely free slot without changing the 15-minute booking rule',()=>{
+ const empty={...config,bookableSessions:[]};
+ const occupied={staff:'coach',start:690,duration:60,status:'Confirmed',data:JSON.stringify({serviceIds:['training']})};
+ const result=computeDayAvailability({config:empty,date,staff:'coach',services:[training],
+  appointments:[occupied],reservedSlots:[690,705,720,735,750],today:date,nowMinutes:700,capacityOpen:serviceCapacityOpen});
+ assert.equal(result.earliestStart,705);
+ assert.ok(result.firstAvailable>result.earliestStart);
+ assert.ok(!result.slots.includes(705));
+});
+test('settings categories stay separated and offer an always-available Save control',async()=>{
+ const root=new URL('../',import.meta.url);
+ const owner=await readFile(new URL('app/studio/owner-dashboard.tsx',root),'utf8');
+ const css=await readFile(new URL('app/globals.css',root),'utf8');
+ for(const category of ['business','availability','sessions','notifications','questions','catalog','team']){
+  assert.match(owner,new RegExp('data-sf-settings-group="'+category+'"'));
+  assert.match(css,new RegExp('data-settings-tab="'+category+'"'));
+ }
+ assert.match(owner,/sf-settings-save/);
+ assert.match(owner,/Next possible 15-minute mark/);
+ const customer=await readFile(new URL('app/book/page.tsx',root),'utf8');
+ assert.match(customer,/First available:/);
+ assert.match(customer,/void availability\(date\)/);
 });
