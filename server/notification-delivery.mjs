@@ -50,6 +50,14 @@ export async function notifyBookingRequest({requestId,origin}){
  const config=JSON.parse(data.settings_data||'{}');
  const selected={email:config.bookingNotifyEmail===true,sms:config.bookingNotifySms===true};
  if(!selected.email&&!selected.sms)return {email:'not_requested',sms:'not_requested'};
+ const recent=(await pool.query("SELECT channel,status,attempted_at FROM booking_notification_attempts WHERE request_id=$1 ORDER BY attempted_at DESC",[requestId])).rows;
+ const disabled={};
+ for(const channel of ['email','sms']){
+  const channelRecords=recent.filter(r=>r.channel===channel);
+  if(channelRecords.some(r=>r.status==='submitted'))disabled[channel]='already_submitted';
+  else if(channelRecords.filter(r=>Date.now()-new Date(r.attempted_at).getTime()<3600000).length>=3)disabled[channel]='rate_limited';
+ }
+ if(Object.keys(selected).every(c=>!selected[c]||disabled[c]))return {email:disabled.email||'not_requested',sms:disabled.sms||'not_requested'};
  const recipient=notificationRecipient(config,data.owner_email);
  const rawToken=randomBytes(32).toString('hex');
  await pool.query("INSERT INTO booking_action_tokens(id,request_id,reviewer,token_hash,expires_at) VALUES($1,$2,$3,$4,now()+interval '72 hours')",[randomUUID(),requestId,recipient.reviewer,tokenHash(rawToken)]);
@@ -59,7 +67,7 @@ export async function notifyBookingRequest({requestId,origin}){
  const message=notificationMessage({businessName:data.business_name,request:data,link});
  const result={email:'not_requested',sms:'not_requested'};
  for(const channel of ['email','sms']){
-  if(!selected[channel])continue;
+  if(!selected[channel]||disabled[channel]){result[channel]=disabled[channel]||'not_requested';continue;}
   const dest=channel==='email'?recipient.email:recipient.phone;
   const attempt=await sendNotificationChannel(channel,dest,message);
   result[channel]=attempt.status;
