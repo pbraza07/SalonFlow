@@ -1,7 +1,8 @@
 import {randomBytes} from 'node:crypto';
 import {getPool} from '../../../../server/database.mjs';
 import {requireOwner} from '../../../../lib/auth';
-import {validOrigin,tokenHash} from '../../../../server/security.mjs';
+import {validOrigin,tokenHash,trustedOrigin} from '../../../../server/security.mjs';
+import {deliveryProviderStatus,notifyBookingRequest} from '../../../../server/notification-delivery.mjs';
 import {reviewPendingRequest} from '../../../../lib/booking-review-actions';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store'};
@@ -13,10 +14,16 @@ async function context(req:Request){
 }
 function err(e:unknown){const m=(e as Error).message;return Response.json({error:m==='AUTH_REQUIRED'?'Sign in to view booking requests.':m==='FORBIDDEN'?'Business not active.':m},{status:m==='AUTH_REQUIRED'?401:m==='FORBIDDEN'?403:/already|no longer|capacity|available|past|changed/i.test(m)?409:400,headers});}
 export async function GET(req:Request){try{const {pool,owner,settings,business}=await context(req);
- const rows=(await pool.query("SELECT id,date,staff_id,start_minute,duration,details,reviewer,status,created_at::text AS created_at FROM booking_requests WHERE owner_id=$1 AND status='pending' ORDER BY created_at DESC LIMIT 100",[owner])).rows;
+ const [items,attempts,account]=await Promise.all([
+  pool.query("SELECT id,date,staff_id,start_minute,duration,details,reviewer,status,created_at::text AS created_at FROM booking_requests WHERE owner_id=$1 AND status='pending' ORDER BY created_at DESC LIMIT 100",[owner]),
+  pool.query("SELECT DISTINCT ON (a.request_id,a.channel) a.request_id,a.channel,a.status,a.destination_masked,a.attempted_at::text AS attempted_at FROM booking_notification_attempts a JOIN booking_requests r ON r.id=a.request_id WHERE r.owner_id=$1 AND r.status='pending' ORDER BY a.request_id,a.channel,a.attempted_at DESC",[owner]),
+  pool.query('SELECT email FROM users WHERE id=$1',[owner])
+ ]);
+ const rows=items.rows;
+ const delivery={};for(const a of attempts.rows){delivery[a.request_id]??={};delivery[a.request_id][a.channel]={status:a.status,destination:a.destination_masked,at:a.attempted_at};}
  return Response.json({enabled:settings.bookingApprovalEnabled===true,reviewer:settings.bookingApprovalReviewer||'owner',
  pending:rows.map((r:{details:string;[key:string]:unknown})=>{const {details,...rest}=r;return {...rest,details:JSON.parse(details)};}),
- pendingCount:rows.length,businessId:business.id},{headers});
+ pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
  }catch(e){return err(e);}}
 export async function POST(req:Request){if(!validOrigin(req))return Response.json({error:'Invalid origin'},{status:403,headers});
  try{
@@ -25,6 +32,14 @@ export async function POST(req:Request){if(!validOrigin(req))return Response.jso
   const body=JSON.parse(raw);
   if(body.action==='review'&&typeof body.accept==='boolean'){
    return Response.json(await reviewPendingRequest(owner,String(body.id), 'owner',body.accept),{headers});
+  }
+  if(body.action==='resendNotification'){
+   const id=String(body.id||'');
+   if(!/^[a-f0-9-]{36}$/i.test(id))throw Error('Invalid booking request.');
+   const pending=(await pool.query("SELECT id FROM booking_requests WHERE id=$1 AND owner_id=$2 AND status='pending'",[id,owner])).rows[0];
+   if(!pending)throw Error('Booking request unavailable or already reviewed.');
+   const summary=await notifyBookingRequest({requestId:id,origin:trustedOrigin(req)});
+   return Response.json({ok:true,delivery:summary},{headers});
   }
   if(body.action==='createStaffLink'){
    const staffId=String(body.staffId||'');
