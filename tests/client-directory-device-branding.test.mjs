@@ -109,7 +109,7 @@ test('Excel protects string cells from spreadsheet formula execution',()=>{
  const sheets=clientWorkbookSheets([{name:'=CMD()',email:'x@example.com',phone:'',bookedSessions:0,attendedSessions:0,attendanceDays:[],
   serviceTypes:[],latestDate:'',history:[]}]);
  const workbook=createClientXlsx(sheets);
- assert.ok(workbook.includes(Buffer.from("'=CMD()")));
+ assert.ok(workbook.includes(Buffer.from("&apos;=CMD()")));
  assert.ok(!workbook.includes(Buffer.from('<f>')));
 });
 test('business-specific push and install names are distinct, safe and PWA manifests get unique identifiers',()=>{
