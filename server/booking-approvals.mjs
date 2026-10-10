@@ -22,14 +22,14 @@ export async function checkCapacity(pool,owner,date,services,start,duration){
  return serviceCapacityOpen(appointments,services,start,duration);
 }
 /** Atomic staff slot + service capacity booking; advisory lock serializes bookings by business/date. */
-export async function confirmBooking({owner,services,staff,date,start,duration,buffer,id,data,pendingId=null}){
+export async function confirmBooking({owner,services,staff,date,start,duration,buffer,id,data,pendingId=null,expectedReviewer=null}){
  const pool=getPool(),client=await pool.connect();
  try{
   await client.query('BEGIN');
   await client.query('SELECT pg_advisory_xact_lock(hashtext($1))',[owner+':'+date]);
   if(pendingId){
-   const pending=await client.query("SELECT id,status,owner_id FROM booking_requests WHERE id=$1 FOR UPDATE",[pendingId]);
-   if(!pending.rows[0]||pending.rows[0].owner_id!==owner||pending.rows[0].status!=='pending'){
+   const pending=await client.query("SELECT id,status,owner_id,reviewer FROM booking_requests WHERE id=$1 FOR UPDATE",[pendingId]);
+   if(!pending.rows[0]||pending.rows[0].owner_id!==owner||pending.rows[0].status!=='pending'||(expectedReviewer&&expectedReviewer!=='owner'&&pending.rows[0].reviewer!==expectedReviewer)){
     const error=new Error('This request has already been reviewed or is unavailable.');error.status=409;throw error;
    }
   }
