@@ -1,3 +1,12 @@
+## v1.3.11 — Secure business-specific device push notifications — October 9, 2026
+- Native Web Push from the owner/team's authenticated device; opt-in with notification permission, no email/SMS provider account required.
+- Adds owner dashboard notification bell with unread counts and per-reviewer read receipts; team reviewers get their own bell and push enrollment.
+- Web Push delivered only to the relevant business owner and designated team reviewer. Push uses VAPID and RFC8291 AES-128-GCM; no third-party npm packages needed.
+- Each pushed notification links to the correct business. Team notifications receive a short-lived, single-request review link. Opening alerts does not approve appointments.
+- Push subscriptions are stored under business_id and reviewer ID; team access is verified using the existing revocable staff link.
+- iPhone Home Screen progressive web app metadata and service worker; Android and desktop browser push support.
+- Additive migration 009. Existing bookings, branding, subscriptions, email, and SMS settings preserved.
+
 ## v1.3.10 — Email and SMS booking review notifications (2026-10-09)
 - Opt-in owner Settings checkboxes choose email, SMS, or both for booking approval messages to either owner or designated team member.
 - Owner may use signed-in email or override it and store a dedicated phone. Staff members can have individual email and mobile notification contact details.
