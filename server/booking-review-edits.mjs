@@ -16,7 +16,7 @@ export function editableBookingDetails(original,input,fields=[]){
  const allowed=new Set(fields.map(f=>f.id));
  if(Object.keys(input.customAnswers).some(key=>!allowed.has(key)))throw Error('Unknown custom booking question.');
  const customAnswers=sanitizeBookingAnswers(fields,input.customAnswers);
- return {...original,customerName,customerEmail,customerPhone,customAnswers,
+ return {...original,originalSubmission:original.originalSubmission||{customerName:original.customerName,customerEmail:original.customerEmail,customerPhone:original.customerPhone,customAnswers:original.customAnswers||{}},customerName,customerEmail,customerPhone,customAnswers,
   correctedAt:new Date().toISOString()};
 }
 export async function editPendingRequest(owner,id,reviewer,input){
