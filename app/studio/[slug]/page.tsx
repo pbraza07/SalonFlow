@@ -1,9 +1,23 @@
 import {cookies} from 'next/headers';
+import type {Metadata} from 'next';
+import {businessDeviceName} from '../../../server/business-device-name.mjs';
 import {redirect} from 'next/navigation';
 import {getPool} from '../../../server/database.mjs';
 import {tokenHash} from '../../../server/security.mjs';
 import OwnerDashboard from '../owner-dashboard';
 export const dynamic='force-dynamic';
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
+ const {slug}=await params;
+ if(!/^[a-z0-9][a-z0-9-]{0,100}$/.test(slug))return {};
+ try{
+  const row=(await getPool().query("SELECT name FROM businesses WHERE slug=$1 AND status='active'",[slug])).rows[0];
+  if(!row)return {};
+  const label=businessDeviceName(row.name);
+  return {title:label,manifest:'/api/business/manifest?slug='+encodeURIComponent(slug),
+   appleWebApp:{capable:true,statusBarStyle:'default',title:label}};
+ }catch{return {};}
+}
+
 export default async function StudioDashboard({params}:{params:Promise<{slug:string}>}){
  const {slug}=await params;
  const token=(await cookies()).get('salonflow_session')?.value;
