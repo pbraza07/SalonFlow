@@ -42,7 +42,7 @@ export function pendingBookingAsAppointment(row){
    price:Number(info.quotedPrice)||0,sessionId:info.sessionId||null,
    customAnswers:info.customAnswers||{},customFieldLabels:info.customFieldLabels||{},
    originalSubmission:info.originalSubmission||null,
-   source:'Customer booking request',
+   source:'Customer booking request',policyAccepted:info.policyAccepted===true,policyAcceptedAt:info.policyAcceptedAt||null,
    created:info.created||row.created_at||null
   })
  };
@@ -122,7 +122,7 @@ export function buildClientDirectory(appointments,settings={},owner=''){
    quotedPrice:Number(data.price)||0,
    customerEmail:email,customerPhone:phone,customerName:name,
    answers,originalSubmission:data.originalSubmission||null,
-   submittedAt:data.created||null
+   submittedAt:data.created||null,policyAccepted:data.policyAccepted===true,policyAcceptedAt:data.policyAcceptedAt||null
   };
   client.history.push(visit);
   if(!['Cancelled','No-show','Pending approval','Declined'].includes(status))client.bookedSessions++;
@@ -156,6 +156,7 @@ export function clientWorkbookSheets(clients){
   for(const v of c.history){visits.push([
    c.name,c.email,v.date,timeLabel(v.time),v.serviceNames.join(', '),v.serviceTypes.join(', '),v.staff,v.status,v.sessionType,v.quotedPrice,v.attended?'Yes':'No'
   ]);
+  if(v.policyAccepted)responses.push([c.name,c.email,v.status,v.date,timeLabel(v.time),'Booking policy consent','Accepted',v.originalSubmission?'Accepted':'']);
   for(const ans of v.answers||[]){
    const original=v.originalSubmission?.customAnswers?.[ans.id];
    responses.push([c.name,c.email,v.status,v.date,timeLabel(v.time),ans.label,String(ans.value),original===undefined?'':String(original)]);
