@@ -1,7 +1,7 @@
 import {getPool} from '../../../../server/database.mjs';
 import {googleGalleryForBusiness} from '../../../../server/google-business-gallery.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';
-export const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
+const headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 export async function GET(req:Request){
  const slug=new URL(req.url).searchParams.get('slug')||'';
  if(!/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(slug))return Response.json({photos:[],link:''},{headers});
