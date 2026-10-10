@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useState} from 'react';
-import {Building2,Check,ChevronDown,Pencil,Plus,RotateCcw,Search,ShieldAlert,Trash2,X} from 'lucide-react';
+import {Building2,Check,Copy,Eye,EyeOff,KeyRound,Pencil,Plus,RotateCcw,Search,ShieldAlert,Trash2,X} from 'lucide-react';
 import {BUSINESS_INDUSTRIES,US_STATES} from '../../lib/business-options';
 import type {BusinessSummary} from './platform-business-directory';
 
@@ -14,7 +14,8 @@ export default function PlatformBusinessManager({businesses,primary,onChanged}:{
  const [expanded,setExpanded]=useState(true),[mode,setMode]=useState<'create'|'edit'|null>(null);
  const [editingId,setEditingId]=useState(''),[values,setValues]=useState<Profile>(empty());
  const [search,setSearch]=useState(''),[working,setWorking]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const [credentials,setCredentials]=useState<{email:string;temporaryPassword:string;business:string;status:string}|null>(null);
+ const [credentials,setCredentials]=useState<{email:string;temporaryPassword:string;business:string;status:string;kind:'create'|'reset'}|null>(null);
+ const [revealCredential,setRevealCredential]=useState(false),[resetting,setResetting]=useState<BusinessSummary|null>(null),[resetConfirmation,setResetConfirmation]=useState('');
  const [removing,setRemoving]=useState<BusinessSummary|null>(null),[confirmation,setConfirmation]=useState('');
  const items=useMemo(()=>businesses.filter(b=>
   !search.trim()||[b.name,b.slug,b.owner_email,b.industry,b.city,b.status].join(' ').toLowerCase().includes(search.toLowerCase().trim())
@@ -53,7 +54,7 @@ export default function PlatformBusinessManager({businesses,primary,onChanged}:{
     !window.confirm('Changing the booking URL may break existing customer links. Continue with the new URL?'))return;
    const result=await post(body);
    if(mode==='create')setCredentials({email:result.ownerEmail,temporaryPassword:result.temporaryPassword,
-    business:values.name,status:result.status});
+    business:values.name,status:result.status,kind:'create'});setRevealCredential(false);
    setNotice(result.message||'Business saved.');
    setMode(null);setEditingId('');await onChanged();
   }catch(e){setError((e as Error).message);}finally{setWorking(false);}
@@ -65,6 +66,18 @@ export default function PlatformBusinessManager({businesses,primary,onChanged}:{
    const result=await post({action:'archive',id:removing.id,confirmName:confirmation});
    setNotice(result.message||'Business archived.');setRemoving(null);setConfirmation('');
    if(removing.id===editingId){setMode(null);setEditingId('');}
+   await onChanged();
+  }catch(e){setError((e as Error).message);}finally{setWorking(false);}
+ }
+ async function resetOwnerPassword(){
+  if(!resetting||!primary)return;
+  setWorking(true);setError('');setNotice('');
+  try{
+   const result=await post({action:'resetPassword',id:resetting.id,confirmName:resetConfirmation});
+   setCredentials({email:result.ownerEmail,temporaryPassword:result.temporaryPassword,
+    business:resetting.name,status:resetting.status,kind:'reset'});
+   setRevealCredential(false);setResetting(null);setResetConfirmation('');
+   setNotice(result.message||'Temporary password generated. Existing sessions have been revoked.');
    await onChanged();
   }catch(e){setError((e as Error).message);}finally{setWorking(false);}
  }
@@ -84,11 +97,15 @@ export default function PlatformBusinessManager({businesses,primary,onChanged}:{
   {error&&<p className="sf-platform-error" role="alert">{error}</p>}
   {notice&&<p className="sf-platform-success" role="status">{notice}</p>}
   {credentials&&<section className="sf-platform-temporary-credentials" role="status">
-   <h3><ShieldAlert size={19}/> New business owner credentials — copy now</h3>
-   <p>The owner account for <b>{credentials.business}</b> has been created as <b>{credentials.status}</b>. The temporary password is shown only once; share it securely and ask the owner to change it after signing in.</p>
-   <label>Owner email<input value={credentials.email} readOnly/></label><label>Temporary password<input value={credentials.temporaryPassword} readOnly/></label>
-   <button className="outline" type="button" onClick={()=>{void navigator.clipboard?.writeText('SelahFlow\nOwner: '+credentials.email+'\nTemporary password: '+credentials.temporaryPassword+'\nSign in: '+window.location.origin+'/login')}}>Copy sign-in details</button>
-   <button type="button" className="outline" onClick={()=>setCredentials(null)}>Dismiss credentials</button>
+   <h3><ShieldAlert size={19}/> {credentials.kind==='reset'?'Owner password reset — one-time credentials':'New business owner credentials — copy now'}</h3>
+   <p>{credentials.kind==='reset'?'A replacement password was generated for':'An owner account was created for'} <b>{credentials.business}</b>. The original password cannot be viewed. This temporary password is displayed only until you dismiss it. Share it securely; the owner must choose a new password at next sign-in.</p>
+   <label>Owner email<input value={credentials.email} readOnly/></label>
+   <label>One-time temporary password
+    <span className="sf-admin-password-display"><input type={revealCredential?'text':'password'} autoComplete="off" value={credentials.temporaryPassword} readOnly/>
+     <button className="outline" type="button" aria-label={revealCredential?'Hide temporary password':'Show temporary password'} onClick={()=>setRevealCredential(v=>!v)}>{revealCredential?<EyeOff size={16}/>:<Eye size={16}/>}</button>
+    </span></label>
+   <button className="outline" type="button" onClick={()=>{void navigator.clipboard?.writeText('SelahFlow\nOwner: '+credentials.email+'\nTemporary password: '+credentials.temporaryPassword+'\nSign in: '+window.location.origin+'/login')}}><Copy size={16}/> Copy sign-in details</button>
+   <button type="button" className="outline" onClick={()=>{setCredentials(null);setRevealCredential(false)}}>Dismiss credentials</button>
   </section>}
   {mode&&<section id="sf-admin-business-form" className="sf-platform-business-editor">
    <header><h3>{mode==='create'?'Add a new business':'Edit business profile'}</h3><button className="outline" type="button" onClick={()=>{setMode(null);setError('')}} disabled={working}><X size={17}/> Close</button></header>
@@ -119,15 +136,29 @@ export default function PlatformBusinessManager({businesses,primary,onChanged}:{
   <div className="sf-platform-manage-search"><Search size={18}/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Find business to edit, remove or restore" aria-label="Search businesses to manage"/>
    <span>{items.length} businesses</span></div>
   <div className="sf-platform-business-rows">{items.map(b=><article key={b.id} className="sf-platform-business-row">
-   <div><strong>{b.name}</strong><small>{b.owner_email} · /{b.slug} · {b.industry}</small></div>
+   <div><strong>{b.name}</strong><small><b>Owner email:</b> {b.owner_email}</small><small>/{b.slug} · {b.industry}</small><small>Password: protected · existing password cannot be displayed</small></div>
    <span className={'sf-platform-business-status status-'+b.status}>{b.status}</span>
    <div className="sf-platform-business-actions">
+    {primary&&<button type="button" className="outline" disabled={working}
+     onClick={()=>{setResetting(b);setResetConfirmation('');setCredentials(null);setRevealCredential(false);setError('');}}>
+      <KeyRound size={15}/> Reset password</button>}
     {b.status==='archived'?<button type="button" className="outline" disabled={working} onClick={()=>void restore(b)}><RotateCcw size={15}/> Restore</button>:
      <><button type="button" className="outline" onClick={()=>edit(b)} disabled={working}><Pencil size={15}/> Edit</button>
       <button type="button" className="outline sf-platform-remove-btn" disabled={working} onClick={()=>{setRemoving(b);setConfirmation('');setError('')}}><Trash2 size={15}/> Remove</button></>}
    </div>
   </article>)}</div>
   {!items.length&&<p>No businesses match the search.</p>}
+  {resetting&&<div className="sf-platform-confirm-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!working)setResetting(null)}}>
+   <section role="dialog" aria-modal="true" aria-labelledby="sf-platform-reset-title" className="sf-platform-confirm">
+    <h3 id="sf-platform-reset-title"><KeyRound size={20}/> Reset owner password?</h3>
+    <p><b>Business:</b> {resetting.name}</p><p><b>Owner:</b> {resetting.owner_email}</p>
+    <p>The owner's current password is not readable. A random temporary password will replace it, every active session will be signed out, and the owner must choose a new private password at next sign-in. This action will be audited.</p>
+    <label>Type the exact business name to confirm<input autoFocus value={resetConfirmation} onChange={e=>setResetConfirmation(e.target.value)}/></label>
+    <div><button type="button" className="outline" onClick={()=>setResetting(null)} disabled={working}>Cancel</button>
+     <button type="button" className="primary" disabled={working||resetConfirmation!==resetting.name} onClick={()=>void resetOwnerPassword()}>
+      <KeyRound size={16}/>{working?'Resetting…':'Reset owner password'}</button></div>
+   </section>
+  </div>}
   {removing&&<div className="sf-platform-confirm-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget&&!working)setRemoving(null)}}>
    <section role="dialog" aria-modal="true" aria-labelledby="sf-platform-archive-title" className="sf-platform-confirm">
     <h3 id="sf-platform-archive-title"><ShieldAlert size={20}/> Remove {removing.name}?</h3>
