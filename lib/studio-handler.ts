@@ -2,6 +2,7 @@ import {db} from './database';
 import {getPool} from '../server/database.mjs';
 import {appointmentData,overlaps,easternClock,bookingDateRange,computeDayAvailability,selectedSession,validateBookableSessions,validateExistingSessionReservations} from '../server/session-scheduling.mjs';
 import {validateBookingFields,sanitizeBookingAnswers} from '../server/booking-custom-fields.mjs';
+import {validateApprovalVisibleFields} from '../server/booking-approval-display.mjs';
 import {requireOwner} from './auth';
 import {tokenHash,validOrigin,trustedOrigin} from '../server/security.mjs';
 import {notifyBookingRequest,validEmail,validE164} from '../server/notification-delivery.mjs';
@@ -18,6 +19,7 @@ export async function ownerGet(req:Request){try{const {owner,config}=await conte
 export async function studioPost(req:Request,isPublic=false){try{if(!validOrigin(req))return reply({error:'Invalid origin'},403);const raw=await req.text();if(raw.length>(isPublic?20000:120000))return reply({error:'Request too large.'},413);let b;try{b=JSON.parse(raw);}catch{return reply({error:'Invalid request.'},400);}if(!b||typeof b!=='object')return reply({error:'Invalid request.'},400);if(isPublic&&!['availability','book','calendar'].includes(b.action))return reply({error:'Action not permitted.'},403);const {owner,config}=await context(req,isPublic);if(isPublic){if(b.website)return reply({error:'Unable to process request.'},400);const ip=(req.headers.get('x-forwarded-for')||'unknown').split(',').at(-1)!.trim();if(!await takeLimit('public:'+owner+':'+tokenHash(ip),120))return reply({error:'Too many requests. Please try again in 15 minutes.'},429);if(b.action==='book'){if(b.policyAccepted!==true)return reply({error:'Please accept the booking policy.'},400);if(!await takeLimit('book:'+owner+':'+tokenHash(ip),12))return reply({error:'Booking limit reached. Please contact the studio.'},429);if(typeof b.email==='string'&&!await takeLimit('email:'+owner+':'+tokenHash(b.email.trim().toLowerCase()),6))return reply({error:'Too many booking requests for this email. Please contact the studio.'},429);}}const audit=(kind:string,data:any)=>db().prepare('INSERT OR IGNORE INTO events(id,owner,created,kind,data) VALUES(?,?,?,?,?)').bind(typeof b.key==='string'&&/^[0-9a-f-]{36}$/.test(b.key)?b.key:crypto.randomUUID(),owner,new Date().toISOString(),kind,JSON.stringify(data));
 if(b.action==='settings'){const c=b.config;
  validateBookingFields(c?.bookingCustomFields||[],c?.bookingPushFields||['customerName','services','date']);
+ validateApprovalVisibleFields(c);
  if(!c||!Array.isArray(c.staff)||!Array.isArray(c.services)||c.staff.length>100||c.services.length>150)throw Error('Check team and service catalog.');
  const plan=await db().prepare('SELECT s.plan_code,s.status FROM business_subscriptions s JOIN businesses b ON b.id=s.business_id WHERE b.owner_id=?').bind(owner).first<{plan_code:string;status:string}>();
  const cap=plan?.status==='active'?({free:1,professional:3,business:10} as Record<string,number>)[plan.plan_code]||1:1;

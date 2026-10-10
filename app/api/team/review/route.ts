@@ -1,6 +1,7 @@
 import {getPool} from '../../../../server/database.mjs';
 import {tokenHash,validOrigin} from '../../../../server/security.mjs';
 import {reviewPendingRequest} from '../../../../lib/booking-review-actions';
+import {approvalFieldsForBusiness,sessionReviewSummary} from '../../../../server/booking-approval-display.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store','Referrer-Policy':'no-referrer'};
 async function context(req:Request){
@@ -15,7 +16,11 @@ async function context(req:Request){
 }
 export async function GET(req:Request){try{const {pool,link,cfg}=await context(req);
  const pending=(await pool.query("SELECT id,date,staff_id,start_minute,duration,details,reviewer,status,created_at::text AS created_at FROM booking_requests WHERE business_id=$1 AND reviewer=$2 AND status='pending' ORDER BY created_at DESC LIMIT 100",[link.business_id,link.staff_id])).rows.map((r:{details:string;[key:string]:unknown})=>{const {details,...rest}=r;return {...rest,details:JSON.parse(details)};});
- return Response.json({businessName:link.business_name,teamMember:cfg.staff.find((s:{id:string})=>s.id===link.staff_id)?.name,pending},{headers});
+ const confirmed=pending.length?(await pool.query("SELECT date,staff,start,duration,status,data FROM appointments WHERE owner=$1 AND date BETWEEN $2 AND $3 AND status NOT IN ('Cancelled','No-show') AND data LIKE '%sessionId%'",[link.owner_id,pending.reduce((d:string,r:{date:string})=>r.date<d?r.date:d,pending[0].date),pending.reduce((d:string,r:{date:string})=>r.date>d?r.date:d,pending[0].date)])).rows:[];
+ return Response.json({businessName:link.business_name,teamMember:cfg.staff.find((s:{id:string})=>s.id===link.staff_id)?.name,
+ pending:pending.map((r:any)=>({...r,sessionInfo:sessionReviewSummary(cfg,r,confirmed,pending)})),
+ approvalFields:approvalFieldsForBusiness(cfg),customFields:(cfg.bookingCustomFields||[]).map((f:{id:string;label:string})=>({id:f.id,label:f.label})),
+ team:cfg.staff.map((s:{id:string;name:string})=>({id:s.id,name:s.name}))},{headers});
  }catch{return Response.json({error:'This review link is invalid, expired, revoked, or no longer assigned.'},{status:403,headers});}}
 export async function POST(req:Request){if(!validOrigin(req))return Response.json({error:'Invalid request origin.'},{status:403,headers});
  try{const {link}=await context(req);
