@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto';
 import {getPool} from '../../../../server/database.mjs';
 import {requireOwner} from '../../../../lib/auth';
 import {validOrigin} from '../../../../server/security.mjs';
-import {buildClientDirectory,clientWorkbookSheets} from '../../../../server/client-history.mjs';
+import {buildClientDirectory,clientWorkbookSheets,pendingBookingAsAppointment} from '../../../../server/client-history.mjs';
 import {applyClientProfiles,findClientForEdit,sameClientContact,validateClientInput} from '../../../../server/client-profile-logic.mjs';
 import {createClientXlsx} from '../../../../server/client-xlsx.mjs';
 import {resolveTheme} from '../../../../server/themes.mjs';
@@ -20,11 +20,12 @@ async function businessFor(owner: string,db:{query:(sql:string,values:unknown[])
  return business;
 }
 async function directory(owner:string,db:{query:(sql:string,values:unknown[])=>Promise<{rows:any[]}>},settings:Record<string,unknown>){
- const [appointments,profiles]=await Promise.all([
+ const [appointments,profiles,requests]=await Promise.all([
   db.query('SELECT id,date,start,duration,staff,status,data FROM appointments WHERE owner=$1 ORDER BY date DESC,start DESC',[owner]),
-  db.query('SELECT id,source_key,anchor_appointment_id,name,email,phone,notes,archived FROM business_client_profiles WHERE owner=$1 ORDER BY created_at,id',[owner])
+  db.query('SELECT id,source_key,anchor_appointment_id,name,email,phone,notes,archived FROM business_client_profiles WHERE owner=$1 ORDER BY created_at,id',[owner]),
+  db.query("SELECT id,date,staff_id,start_minute,duration,details,status,created_at FROM booking_requests WHERE owner_id=$1 AND status IN ('pending','declined') ORDER BY created_at DESC",[owner])
  ]);
- const derived=buildClientDirectory(appointments.rows,settings,owner);
+ const derived=buildClientDirectory([...appointments.rows,...requests.rows.map(pendingBookingAsAppointment)],settings,owner);
  return {derived,profiles:profiles.rows,...applyClientProfiles(derived,profiles.rows)};
 }
 function failure(error:unknown){
