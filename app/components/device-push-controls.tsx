@@ -1,8 +1,9 @@
 'use client';
 import {useEffect,useState} from 'react';
+import {businessDeviceName} from '../../server/business-device-name.mjs';
 const decodeKey=(raw:string)=>{const padded=raw.padEnd(Math.ceil(raw.length/4)*4,'=').replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(padded),c=>c.charCodeAt(0));};
 export default function DevicePushControls({teamToken}:{teamToken?:string}){
- const [supported,setSupported]=useState(false),[installed,setInstalled]=useState(false),[permission,setPermission]=useState('default'),[ready,setReady]=useState(false),[configured,setConfigured]=useState(false),[devices,setDevices]=useState(0),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState('');
+ const [supported,setSupported]=useState(false),[installed,setInstalled]=useState(false),[permission,setPermission]=useState('default'),[ready,setReady]=useState(false),[configured,setConfigured]=useState(false),[devices,setDevices]=useState(0),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[status,setStatus]=useState(''),[businessName,setBusinessName]=useState(''),[businessSlug,setBusinessSlug]=useState('');
  const headers:Record<string,string>=teamToken?{Authorization:'Bearer '+teamToken}:{};
  const ios=typeof navigator!=='undefined'&&/iPad|iPhone|iPod/.test(navigator.userAgent);
  async function refresh(){
@@ -14,7 +15,7 @@ export default function DevicePushControls({teamToken}:{teamToken?:string}){
   try{
    const r=await fetch('/api/push',{headers,cache:'no-store'}),d=await r.json();
    if(!r.ok)throw Error(d.error||'Unable to check push service.');
-   setConfigured(d.configured===true);setDevices(d.subscribedDevices||0);
+   setConfigured(d.configured===true);setDevices(d.subscribedDevices||0);setBusinessName(typeof d.businessName==='string'?d.businessName:'');setBusinessSlug(typeof d.businessSlug==='string'?d.businessSlug:'');
    if(!d.configured){setStatus('Push keys have not been configured on the SelahFlow server.');return;}
    const reg=await navigator.serviceWorker.getRegistration('/');
    const subscription=await reg?.pushManager.getSubscription();
@@ -42,7 +43,7 @@ export default function DevicePushControls({teamToken}:{teamToken?:string}){
    const result=await save.json();
    if(!save.ok)throw Error(result.error||'Device registration failed.');
    setEnabled(true);setConfigured(true);
-   setStatus('Notifications enabled for this device and this business. New booking requests will generate alerts.');
+   setStatus('Notifications enabled for '+businessDeviceName(configuration.businessName||businessName)+'. New booking requests will identify this business.');
    await refresh();
   }catch(e){setStatus((e as Error).message);}finally{setBusy(false);}
  }
@@ -60,12 +61,12 @@ export default function DevicePushControls({teamToken}:{teamToken?:string}){
   }catch(e){setStatus((e as Error).message);}finally{setBusy(false);}
  }
  return <section className="sf-push-settings" aria-label="Device push notifications">
- <div className="sf-push-settings-head"><div><strong>Device push notifications</strong><p>Get booking alerts on this phone or computer even when SelahFlow is closed. Each device must opt in separately.</p></div><span className={enabled?'sf-push-on':'sf-push-off'}>{enabled?'Enabled':'Not enabled'}</span></div>
+ <div className="sf-push-settings-head"><div><strong>Device push notifications</strong><p>Get booking alerts on this phone or computer even when SelahFlow is closed. Each device must opt in separately.</p>{businessName&&<p className="sf-device-app-label"><b>Business notification name:</b> {businessDeviceName(businessName)}</p>}</div><span className={enabled?'sf-push-on':'sf-push-off'}>{enabled?'Enabled':'Not enabled'}</span></div>
  <p className="muted"><small>Device permission: {permission} · Registered reviewer devices: {devices} · {configured?'Push server configured':'Push server setup required'}</small></p>
- {ios&&!installed&&<p className="sf-push-instructions">iPhone: In Safari, tap <b>Share → Add to Home Screen</b>. Launch SelahFlow from the Home Screen, sign in/open your team link, then select Enable notifications.</p>}
+ {ios&&!installed&&<p className="sf-push-instructions">iPhone: While viewing this business's SelahFlow page in Safari, tap <b>Share → Add to Home Screen</b>. The suggested app name is <b>{businessDeviceName(businessName)}</b>. Then launch this business's icon and select Enable notifications.</p>}
  {!supported&&<p className="sf-push-instructions">Web Push is not available in this browser. Use a supported current browser; iOS requires an installed Home Screen web app (iOS 16.4+).</p>}
  <div className="sf-push-buttons"><button type="button" className="primary" onClick={enable} disabled={busy||!supported||!configured}>{busy?'Working…':enabled?'Re-enable for this reviewer':'Enable notifications on this device'}</button>{enabled&&<button type="button" className="outline" disabled={busy} onClick={disable}>Disable on this device</button>}</div>
  {status&&<p role="status" className="sf-push-status">{status}</p>}
- <small>No SMS fees or app-store installation are required for Web Push. Notifications require HTTPS, device permission, and an active internet connection. Email/SMS remain independent.</small>
+ <small>Each business has its own notification identity. For an existing Home Screen icon, remove and reinstall the shortcut to update its name. Browser or iOS permission prompts may still display the website address or original app name; the operating system controls that text. Email/SMS remain independent.</small>
  </section>;
 }
