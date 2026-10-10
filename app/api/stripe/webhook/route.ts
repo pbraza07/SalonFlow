@@ -46,7 +46,7 @@ export async function POST(req:Request){
     // proof that a recurring subscription's first invoice was paid.
    }else if(event.type==='invoice.paid'&&membershipId){
     const result=await db.query(
-     "SELECT m.id,p.price_cents FROM customer_memberships m JOIN membership_plans p ON p.id=m.plan_id WHERE m.id=$1 AND m.business_id=$2 AND m.stripe_account_id=$3 FOR UPDATE",
+     "SELECT m.id,m.price_cents FROM customer_memberships m WHERE m.id=$1 AND m.business_id=$2 AND m.stripe_account_id=$3 FOR UPDATE",
      [membershipId,merchant.business_id,account]);
     if(result.rows[0]&&Number(object.amount_paid)>=Number(result.rows[0].price_cents)){
      await db.query(
