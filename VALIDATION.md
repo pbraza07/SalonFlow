@@ -1,3 +1,14 @@
+# v1.3.10 Validation
+- npm ci && npm run typecheck && npm test && npm run build.
+- Owner can select email, SMS, or both, and choose owner or staff reviewer. All notification contacts are validated.
+- Public booking with approval enabled creates pending request; no calendar slot until accepted.
+- With verified provider credentials: email/SMS notification contains customer/service/date/time and review link; provider acceptance is shown in dashboard. Without credentials: dashboard indicates not configured, and no message is falsely reported as delivered.
+- GET review link previews only; it cannot change a request. POST with a valid 72h token and explicit accept/decline changes the status. Replays fail.
+- Accept checks team assignment, time, service limits; Decline leaves appointment calendar unchanged.
+- Staff reviewer contacts are owner-managed; owner can resend failed channels with rate limit and successful channels never resend automatically.
+- Existing v1.3.9 in-app staff review links and existing bookings remain functional.
+- Render startup applies migration 008, and /api/health reports 1.3.10.
+
 # v1.3.9 acceptance tests
 - npm ci; npm run typecheck; npm test; npm run build
 - Check /signup business categories sorted alphabetically by displayed label.

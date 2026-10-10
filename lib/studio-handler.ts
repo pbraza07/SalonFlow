@@ -1,6 +1,7 @@
 import {db} from './database';
 import {requireOwner} from './auth';
-import {tokenHash,validOrigin} from '../server/security.mjs';
+import {tokenHash,validOrigin,trustedOrigin} from '../server/security.mjs';
+import {notifyBookingRequest,validEmail,validE164} from '../server/notification-delivery.mjs';
 
 import {defaultSettings,today} from './defaults';
 import {validDuration,isCalendarUnit} from './service-terms';
@@ -22,7 +23,17 @@ if(b.action==='settings'){const c=b.config;
  if(!c.services.every((p:any)=>typeof p.id==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(p.id)&&typeof p.name==='string'&&p.name.trim()&&p.name.length<=100&&typeof p.category==='string'&&p.category.trim()&&p.category.length<=60))throw Error('Check service types and names.');
  for(const id of oldTeam.filter((p:any)=>!c.staff.some((q:any)=>q.id===p.id)).map((p:any)=>p.id)){const pending=await db().prepare("SELECT 1 FROM appointments WHERE owner=? AND staff=? AND date>=? AND status NOT IN ('Cancelled','No-show','Completed') LIMIT 1").bind(owner,id,today()).first();if(pending)throw Error('Cancel or complete future bookings before removing this team member.');}
 if((c.city!==undefined&&(typeof c.city!=='string'||c.city.length>80))||(c.region!==undefined&&(typeof c.region!=='string'||c.region.length>80))||(typeof c.address!=='string'||c.address.length>350||/[<>\u0000-\u001f]/.test(c.address)))throw Error('Check business address and location.');
-if(!c?.name?.trim()||c.name.length>100||!Array.isArray(c.services)||!Array.isArray(c.staff)||!Number.isInteger(c.open)||!Number.isInteger(c.close)||c.open<0||c.close>24||c.open>=c.close||!Number.isInteger(c.buffer)||c.buffer<0||c.buffer>60||c.buffer%15!==0||!Number.isFinite(c.tax)||c.tax<0||c.tax>20)throw Error('Check business name, whole-hour opening times, 15-minute buffer and tax.');if(c.bookingApprovalEnabled!==undefined&&typeof c.bookingApprovalEnabled!=='boolean')throw Error('Invalid booking approval toggle.');
+if(!c?.name?.trim()||c.name.length>100||!Array.isArray(c.services)||!Array.isArray(c.staff)||!Number.isInteger(c.open)||!Number.isInteger(c.close)||c.open<0||c.close>24||c.open>=c.close||!Number.isInteger(c.buffer)||c.buffer<0||c.buffer>60||c.buffer%15!==0||!Number.isFinite(c.tax)||c.tax<0||c.tax>20)throw Error('Check business name, whole-hour opening times, 15-minute buffer and tax.');if(!c.staff.every((m:any)=>(m.notificationEmail===undefined||m.notificationEmail===''||validEmail(m.notificationEmail))&&(m.notificationPhone===undefined||m.notificationPhone===''||validE164(m.notificationPhone))))throw Error('Team notification contacts require valid email and phone in +1XXXXXXXXXX format.');
+ if(c.bookingNotifyOwnerEmail!==undefined&&c.bookingNotifyOwnerEmail!==''&&!validEmail(c.bookingNotifyOwnerEmail))throw Error('Enter a valid owner notification email.');
+ if(c.bookingNotifyOwnerPhone!==undefined&&c.bookingNotifyOwnerPhone!==''&&!validE164(c.bookingNotifyOwnerPhone))throw Error('Owner SMS phone must include country code (example: +18135550123).');
+ if((c.bookingNotifyEmail!==undefined&&typeof c.bookingNotifyEmail!=='boolean')||(c.bookingNotifySms!==undefined&&typeof c.bookingNotifySms!=='boolean'))throw Error('Invalid notification channels.');
+ if(c.bookingApprovalEnabled&&(c.bookingNotifyEmail===true||c.bookingNotifySms===true)){
+  const reviewer=c.bookingApprovalReviewer||'owner',member=c.staff.find((m:any)=>m.id===reviewer);
+  const recipient=reviewer==='owner'?{email:c.bookingNotifyOwnerEmail||((await db().prepare('SELECT email FROM users WHERE id=?').bind(owner).first<{email:string}>())?.email||''),phone:c.bookingNotifyOwnerPhone||''}:member?{email:member.notificationEmail||'',phone:member.notificationPhone||''}:{email:'',phone:''};
+  if(c.bookingNotifyEmail===true&&!validEmail(recipient.email))throw Error('Add a valid email for the selected booking reviewer.');
+  if(c.bookingNotifySms===true&&!validE164(recipient.phone))throw Error('Add a phone in +1XXXXXXXXXX format for the selected booking reviewer.');
+ }
+ if(c.bookingApprovalEnabled!==undefined&&typeof c.bookingApprovalEnabled!=='boolean')throw Error('Invalid booking approval toggle.');
  if(c.bookingApprovalReviewer!==undefined&&c.bookingApprovalReviewer!=='owner'&&!c.staff.some((s:any)=>s.id===c.bookingApprovalReviewer))throw Error('Choose the owner or an existing team member to review requests.');
  for(const s of c.services)if(!validSlotCapacity(s.maxSlots??1))throw Error('Service slots must be between 1 and 20.');
  for(const s of c.services)if(!s.name||s.price<0||!Number.isFinite(s.price)||!validDuration(s))throw Error('Enter a valid service duration (minutes, hours, days, weeks, months or years); prices cannot be negative.');await db().batch([db().prepare('INSERT INTO settings(owner,data) VALUES(?,?) ON CONFLICT(owner) DO UPDATE SET data=excluded.data').bind(owner,JSON.stringify(c)),db().prepare('UPDATE businesses SET name=?,city=COALESCE(?,city),region=COALESCE(?,region),updated_at=now() WHERE owner_id=?').bind(c.name,typeof c.city==='string'?c.city:null,typeof c.region==='string'?c.region:null,owner),audit('settings',{})]);return reply({ok:true});}
@@ -36,7 +47,10 @@ if(b.key){const prior=await db().prepare('SELECT id FROM appointments WHERE owne
   try{
    await db().prepare("INSERT INTO booking_requests(id,business_id,owner_id,date,staff_id,start_minute,duration,details,reviewer) VALUES(?,?,?,?,?,?,?,?,?)").bind(id,business.id,owner,b.date,b.staff,b.start,duration,JSON.stringify(details),approval.reviewer).first();
   }catch(error){if((error as {code?:string}).code!=='23505')throw error;return reply({ok:true,id,pending:true});}
-  return reply({ok:true,id,pending:true,status:'pending',message:'Booking request sent for approval. The appointment is not confirmed until accepted.'});
+  let delivery:any={email:'not_requested',sms:'not_requested'};
+  try{delivery=await notifyBookingRequest({requestId:id,origin:trustedOrigin(req)});}
+  catch(error){console.error('Booking notification dispatch error for request',id);delivery={email:config.bookingNotifyEmail===true?'failed':'not_requested',sms:config.bookingNotifySms===true?'failed':'not_requested'};}
+  return reply({ok:true,id,pending:true,status:'pending',notificationDelivery:delivery,message:'Booking request received, awaiting approval. The appointment is not confirmed until accepted.'});
  }
  try{await confirmBooking({owner,services,staff:b.staff,date:b.date,start:b.start,duration,buffer:config.buffer,id,data});}
  catch(error){return reply({error:(error as Error).message},(error as {status?:number}).status||409);}
