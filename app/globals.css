@@ -420,3 +420,13 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
  .sf-settings-form .sf-settings-card .form-row{display:block}
  .sf-settings-form .sf-settings-nav-item{width:132px}
 }
+
+
+/* First available booking slot: visible without needing to inspect calendar metadata. */
+.sf-booking-earliest-note{display:flex;align-items:flex-start;gap:11px;max-width:100%;margin:13px 0;padding:12px 14px;border:1px solid #bddac6;border-radius:11px;background:#eef7f0;color:#1f5238;box-sizing:border-box;text-align:left;overflow-wrap:anywhere}
+.sf-booking-earliest-note>svg{flex:0 0 auto;color:#24714a;margin-top:2px}
+.sf-booking-earliest-note strong,.sf-booking-earliest-note b{color:#1b4d34!important;font-size:13px;display:block;margin-bottom:4px}
+.sf-booking-earliest-note p{margin:5px 0!important;font-size:12px;color:#315f44!important;line-height:1.55}
+.sf-booking-earliest-note small{display:block;color:#3d6450!important;font-size:11px;line-height:1.55}
+.public-page[data-selah-theme] .sf-booking-earliest-note,.app-shell[data-selah-theme] .sf-booking-earliest-note{background:#eef7f0!important;color:#1f5238!important;border-color:#bddac6!important}
+@media(max-width:650px){.sf-booking-earliest-note{margin:10px 0;padding:11px}.sf-booking-earliest-note strong{font-size:12px}}
