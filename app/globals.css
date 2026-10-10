@@ -328,3 +328,95 @@ button:focus-visible,a:focus-visible{outline:3px solid #123F3A;outline-offset:3p
  .sf-public-calendar-grid,.sf-calendar-period-grid{grid-template-columns:minmax(0,1fr)}
  .sf-public-calendar-modes button{font-size:12px}
 }
+
+
+/* SelahFlow v1.3.18 — owner settings workspace. Intentional, accessible layout
+   for every business without changing tenant data or saved form field names. */
+.sf-settings-form{max-width:1450px;margin:0 auto;min-width:0;--sf-settings-ink:#173d35;--sf-settings-muted:#536760;--sf-settings-line:#dde6de;--sf-settings-soft:#f5f8f5}
+.sf-settings-intro{padding:clamp(18px,3.2vw,32px);margin-bottom:20px;border-radius:17px;border:1px solid #dce8de;background:linear-gradient(125deg,#f3f9f5 0%,#fffefa 85%);color:var(--sf-settings-ink);box-shadow:0 9px 24px rgba(15,57,44,.04)}
+.sf-settings-eyebrow{display:inline-flex;align-items:center;gap:7px;color:#44765b;font-size:11px;letter-spacing:.14em;font-weight:800}
+.sf-settings-intro h2{margin:8px 0 10px;color:var(--sf-settings-ink);font-size:clamp(21px,2.5vw,29px);letter-spacing:-.035em}
+.sf-settings-intro>p{margin:0;max-width:730px;font-size:14px;line-height:1.7;color:var(--sf-settings-muted)}
+.sf-settings-status{display:flex;flex-wrap:wrap;gap:10px 23px;margin-top:20px}
+.sf-settings-status span{display:inline-flex;gap:7px;align-items:center;color:#2d6150;font-size:12px;font-weight:650}
+.sf-settings-layout{display:grid;grid-template-columns:minmax(235px,270px) minmax(0,1fr);gap:22px;align-items:start;min-width:0}
+.sf-settings-nav{display:grid;gap:5px;position:sticky;top:20px;padding:9px;border:1px solid #e0e9e1;border-radius:15px;background:#fff;box-shadow:0 8px 24px rgba(23,57,46,.035);min-width:0}
+.sf-settings-form .sf-settings-nav-item{appearance:none;display:flex;align-items:center;text-align:left;gap:12px;border:1px solid transparent;padding:12px 11px;border-radius:10px;background:transparent;color:#35594c;width:100%;min-height:61px;box-sizing:border-box;cursor:pointer;transition:background .15s,border-color .15s}
+.sf-settings-nav-item>svg:first-child{flex:none;color:#4d7464}
+.sf-settings-nav-item>svg:last-child{flex:none;margin-left:auto;opacity:.55}
+.sf-settings-nav-item>span{min-width:0;flex:1}
+.sf-settings-nav-item b{display:block;color:inherit;font-size:13px;line-height:1.3}
+.sf-settings-nav-item small{display:block;color:#687d73;font-size:11px;line-height:1.35;margin-top:3px}
+.sf-settings-form .sf-settings-nav-item.active{background:#edf5ef;color:#184936;border-color:#cfe0d1;box-shadow:inset 3px 0 #35805c}
+.sf-settings-form .sf-settings-nav-item.active>svg:first-child{color:#1c6649}
+.sf-settings-form .sf-settings-nav-item:hover:not(.active){background:#f6f8f6;border-color:#e6ece7}
+.sf-settings-form .sf-settings-nav-item:focus-visible{outline:3px solid #c9a543;outline-offset:2px}
+.sf-settings-main{min-width:0}
+.sf-settings-section-heading{margin:0 0 14px;padding:5px 2px;color:var(--sf-settings-ink)}
+.sf-settings-section-kicker{font-size:10px;letter-spacing:.13em;font-weight:800;color:#63907b}
+.sf-settings-section-heading h3{color:var(--sf-settings-ink);font-size:clamp(19px,2vw,24px);line-height:1.35;margin:6px 0 3px}
+.sf-settings-section-heading p{color:var(--sf-settings-muted);margin:0;font-size:13px;line-height:1.6}
+.sf-settings-form .sf-settings-panels{display:block!important;min-width:0;margin:0;padding:0}
+.sf-settings-form [data-sf-settings-group]{display:none!important}
+.sf-settings-form[data-settings-tab="business"] [data-sf-settings-group="business"],
+.sf-settings-form[data-settings-tab="availability"] [data-sf-settings-group="availability"],
+.sf-settings-form[data-settings-tab="sessions"] [data-sf-settings-group="sessions"],
+.sf-settings-form[data-settings-tab="notifications"] [data-sf-settings-group="notifications"],
+.sf-settings-form[data-settings-tab="questions"] [data-sf-settings-group="questions"],
+.sf-settings-form[data-settings-tab="catalog"] [data-sf-settings-group="catalog"],
+.sf-settings-form[data-settings-tab="team"] [data-sf-settings-group="team"]{display:block!important}
+.sf-settings-form .sf-settings-card{width:100%;min-width:0;max-width:none;margin:0 0 13px!important;padding:clamp(17px,2.4vw,26px)!important;background:#fff!important;border:1px solid var(--sf-settings-line)!important;border-radius:15px;box-shadow:0 6px 20px rgba(31,65,46,.035);color:var(--sf-settings-ink)!important;box-sizing:border-box}
+.sf-settings-form .sf-settings-card h2{display:flex;align-items:center;flex-wrap:wrap;gap:10px;color:var(--sf-settings-ink)!important;font-size:18px;line-height:1.35;margin:0 0 14px}
+.sf-settings-form .sf-settings-card h3{color:var(--sf-settings-ink)!important;font-size:15px;margin:20px 0 11px}
+.sf-settings-form .sf-settings-card :is(label,p,span,small){color:#344e43}
+.sf-settings-form .sf-settings-card .muted{color:#63766c!important;line-height:1.65}
+.sf-settings-form .sf-settings-card label{display:block;margin:11px 0;min-width:0;font-weight:600;font-size:13px}
+.sf-settings-form .sf-settings-card label input:not([type="checkbox"]),
+.sf-settings-form .sf-settings-card label :is(select,textarea){display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;margin-top:6px;border-radius:9px;border:1px solid #bdcec2;background:#fff;color:#193d32;min-height:42px;padding:9px 12px}
+.sf-settings-form .sf-settings-card label textarea{min-height:94px;resize:vertical}
+.sf-settings-form .sf-settings-card :is(input,select,textarea):focus-visible{outline:2px solid #4c956a;outline-offset:1px;border-color:#417657}
+.sf-settings-form .sf-settings-card label:has(>input[type="checkbox"]){display:flex;gap:9px;align-items:center;min-height:36px;line-height:1.45}
+.sf-settings-form .sf-settings-card input[type="checkbox"]{width:18px;height:18px;flex:none;accent-color:#236343}
+.sf-settings-form .sf-settings-card :is(.button-row,.form-row){gap:12px;flex-wrap:wrap}
+.sf-settings-form .sf-settings-card :is(button.outline,button.primary){min-height:42px;border-radius:9px}
+.sf-settings-form .sf-settings-custom-field{padding:15px;border:1px solid #dce8de;background:#f7faf7;border-radius:11px;margin:15px 0;min-width:0}
+.sf-settings-booking-rule{display:flex;align-items:flex-start;gap:13px;padding:16px;margin:0 0 18px;border:1px solid #bcdac8;border-radius:12px;background:#f0f8f2;color:#1c4f36}
+.sf-settings-booking-rule>svg{flex:none;color:#28704b;margin-top:1px}
+.sf-settings-booking-rule strong{display:block;color:#1c513b;font-size:14px;line-height:1.4}
+.sf-settings-booking-rule p{margin:6px 0;color:#416756!important;line-height:1.6;font-size:12px}
+.sf-settings-booking-rule small{font-weight:700;color:#286444!important}
+.sf-settings-form .sf-session-editor{background:#f9fbf9;border-color:#dbe7de}
+.sf-settings-form .sf-session-editor p.sf-session-capacity{background:#e9f4ed;color:#204b35}
+.sf-settings-form .sf-settings-card .table-wrap{max-width:100%;overflow-x:auto}
+.sf-settings-form .sf-settings-card table{min-width:780px}
+.sf-settings-form .sf-settings-card .client-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))}
+.sf-settings-form .sf-settings-card .service-check{display:flex;gap:9px;align-items:center}
+.sf-settings-form .sf-settings-card .service-check input[type="checkbox"]{display:inline-block}
+.sf-settings-form .sf-settings-save{display:flex;position:sticky;bottom:12px;z-index:30;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:13px 16px;margin-top:18px;border:1px solid #cadfd0;border-radius:13px;background:#fff;box-shadow:0 9px 28px rgba(25,58,40,.11)}
+.sf-settings-form .sf-settings-save .muted{display:inline-flex;align-items:center;gap:7px;flex:1;min-width:210px;color:#476d54!important;font-size:12px;line-height:1.45}
+.sf-settings-form .sf-settings-save button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;min-width:190px;padding:12px 18px;font-weight:700}
+@media(max-width:1000px){
+ .sf-settings-layout{grid-template-columns:minmax(190px,225px) minmax(0,1fr);gap:15px}
+ .sf-settings-nav{position:static}
+ .sf-settings-nav-item small{font-size:10px}
+}
+@media(max-width:760px){
+ .sf-settings-layout{display:block}
+ .sf-settings-intro{padding:18px;margin-bottom:13px}
+ .sf-settings-status{margin-top:15px}
+ .sf-settings-nav{position:relative;display:flex;gap:8px;overflow-x:auto;padding:8px;margin-bottom:16px;scrollbar-width:thin;scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+ .sf-settings-form .sf-settings-nav-item{flex:0 0 auto;width:146px;min-height:76px;padding:10px;align-items:flex-start;gap:7px;scroll-snap-align:start}
+ .sf-settings-nav-item>svg:first-child{width:17px;height:17px}
+ .sf-settings-nav-item>svg:last-child{display:none}
+ .sf-settings-nav-item b{font-size:12px}
+ .sf-settings-nav-item small{font-size:10px}
+ .sf-settings-section-heading{margin-bottom:12px}
+ .sf-settings-form .sf-settings-card{padding:17px!important}
+ .sf-settings-form .sf-settings-save{bottom:8px;padding:10px;border-radius:10px}
+ .sf-settings-form .sf-settings-save .muted{display:none}
+ .sf-settings-form .sf-settings-save button{width:100%;min-width:0}
+}
+@media(max-width:390px){
+ .sf-settings-form .sf-settings-card .form-row{display:block}
+ .sf-settings-form .sf-settings-nav-item{width:132px}
+}
