@@ -2,6 +2,7 @@ import {db} from './database';
 import {requireOwner} from './auth';
 import {tokenHash,validOrigin,trustedOrigin} from '../server/security.mjs';
 import {notifyBookingRequest,validEmail,validE164} from '../server/notification-delivery.mjs';
+import {pushBookingRequest} from '../server/push-delivery.mjs';
 
 import {defaultSettings,today} from './defaults';
 import {validDuration,isCalendarUnit} from './service-terms';
@@ -47,6 +48,7 @@ if(b.key){const prior=await db().prepare('SELECT id FROM appointments WHERE owne
   try{
    await db().prepare("INSERT INTO booking_requests(id,business_id,owner_id,date,staff_id,start_minute,duration,details,reviewer) VALUES(?,?,?,?,?,?,?,?,?)").bind(id,business.id,owner,b.date,b.staff,b.start,duration,JSON.stringify(details),approval.reviewer).first();
   }catch(error){if((error as {code?:string}).code!=='23505')throw error;return reply({ok:true,id,pending:true});}
+  try{await pushBookingRequest(id);}catch(e){console.error('Web Push dispatch failed for request',id);}
   let delivery:any={email:'not_requested',sms:'not_requested'};
   try{delivery=await notifyBookingRequest({requestId:id,origin:trustedOrigin(req)});}
   catch(error){console.error('Booking notification dispatch error for request',id);delivery={email:config.bookingNotifyEmail===true?'failed':'not_requested',sms:config.bookingNotifySms===true?'failed':'not_requested'};}

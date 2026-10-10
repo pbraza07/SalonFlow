@@ -1,3 +1,16 @@
+# v1.3.11 Web Push acceptance
+- npm ci, npm run typecheck, npm test, npm run build.
+- Verify /api/health reports 1.3.11, /sw.js and /manifest.webmanifest available on HTTPS.
+- Owner Settings → Device Push → Enable prompts for permission on a direct user click and registers a device only under that logged-in business.
+- Team reviewer (authorized expiring team link) can enable their own device and see only their assigned requests.
+- Owner top bar bell shows pending/unread counts, clicking marks items read, and navigation opens the correct approval inbox.
+- New request for Crawford notifies only Crawford's owner and designated team reviewers. Notification tap never accepts/declines without explicit confirmation.
+- Confirm missing VAPID env values show Not configured without claiming delivery.
+- Verify invalid Web Push endpoints (localhost/internal HTTP) rejected to prevent SSRF; expired push endpoints pruned.
+- Verify no customer data is displayed in public marketplace or unrelated businesses. No existing bookings changed by migration.
+- On iOS 16.4+, install Home Screen web app and enable notifications there; on Android and desktop browsers test actual receipt with consent.
+- Ensure Render VAPID_PRIVATE_KEY persists through subsequent deployments and Render records successful migration 009.
+
 # v1.3.10 Validation
 - npm ci && npm run typecheck && npm test && npm run build.
 - Owner can select email, SMS, or both, and choose owner or staff reviewer. All notification contacts are validated.

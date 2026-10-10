@@ -1,3 +1,11 @@
+# SelahFlow Studio 1.3.11 — Business-specific Web Push
+
+Owners and designated team reviewers can enable native device/browser notifications using their own device in the business's secure dashboard. When a customer requests approval, SelahFlow delivers a Web Push message to the currently authorized reviewers for that business. Tapping opens the review UI but does **not** accept a booking. In-app bells display unread and pending requests, with separate read receipts for each reviewer. iPhone (iOS/iPadOS 16.4+) requires Safari → Share → Add to Home Screen, then permission from the installed Home Screen app. Android and modern desktop browsers can enable notifications normally.
+
+**Technology:** RFC 8291 aes128gcm Web Push, VAPID JWT ES256 generated and encrypted with Node built-ins (no new package dependencies). Service worker at /sw.js, PWA manifest, per-business and per-reviewer PostgreSQL subscriptions, cached/read state on server only (no browser persistence of customer histories). Token-authenticated designated team reviewers register their own devices; revoked team links or reviewer changes prevent further pushes.
+
+**Render secret setup:** `VAPID_PUBLIC_KEY` (base64url uncompressed EC P-256 point), `VAPID_PRIVATE_KEY` (base64url 32-byte scalar), and `VAPID_SUBJECT` (contact URI, e.g., `mailto:pbraza@gmail.com`). Keys must be generated as a matched pair and retained across deployments. Email and SMS remain independent. See docs/RELEASE_v1.3.11_WEB_PUSH.md.
+
 # SelahFlow v1.3.10 — Email and SMS Booking Review Links
 
 Select **Dashboard → Settings → Booking requests and reviewer notifications**. Enable booking approval, choose Business owner or a team reviewer, and tick **Send by email**, **Send by SMS**, or both. For the owner, enter a notification phone in E.164 format and optionally override the signed-in email. For team members, enter their email and phone under **Your team**, then save. A new customer booking creates a pending request and sends its details and a 72-hour review link to the designated recipient using connected providers. Click **Accept** or **Decline** on the linked page to make a decision.
