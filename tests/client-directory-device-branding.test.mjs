@@ -91,7 +91,7 @@ test('Excel workbook has three named worksheets and preserves attendance facts',
   appointment('2','a','Alex','alex@example.com','2026-10-02','Confirmed',['private'])
  ],settings,'a')[0];
  const sheets=clientWorkbookSheets([c]);
- assert.deepEqual(sheets.map(s=>s.name),['Clients','Service History','Attendance Days']);
+ assert.deepEqual(sheets.map(s=>s.name),['Clients','Service History','Attendance Days','Booking Answers']);
  assert.equal(sheets[0].rows[1][3],2);
  assert.equal(sheets[0].rows[1][4],1);
  assert.equal(sheets[0].rows[1][5],1);
