@@ -6,7 +6,7 @@ import {themeStyles} from '../../../server/themes.mjs';
 import GoogleBusinessGallery from '../../components/google-business-gallery';
 type Plan={id:string;name:string;description:string;interval:'week'|'month'|'year';priceCents:number};
 type Summary={slug:string;name:string;plans:Plan[];canPay:boolean;theme:any;brandPrimary:string;brandBackground:string};
-const price=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
+const price=(n:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
 export default function MembershipEnrollment(){
  const [data,setData]=useState<Summary|null>(null),[slug,setSlug]=useState(''),[planId,setPlanId]=useState(''),[step,setStep]=useState(1);
  const [name,setName]=useState(''),[email,setEmail]=useState(''),[accept,setAccept]=useState(false);
