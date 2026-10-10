@@ -21,7 +21,7 @@ export async function GET(req:Request,{params}:{params:Promise<{id:string}>}){
    pool.query("SELECT COUNT(*)::int AS appointment_count,COUNT(DISTINCT NULLIF(lower(data::jsonb->>'email'),''))::int AS unique_clients FROM appointments WHERE owner=$1",[b.owner_id]),
    pool.query("SELECT id,service_name,duration_value,duration_unit,client_name,client_email,starts_on::text AS starts_on,ends_on::text AS ends_on,status FROM service_enrollments WHERE business_id=$1 ORDER BY created_at DESC LIMIT 100",[b.id])
   ]);
-  const appointments=history.rows.map(row=>{
+  const appointments=history.rows.map((row:{id:string;date:string;staff:string;start:number;duration:number;status:string;data:string})=>{
    let a:StoredBooking={};try{a=JSON.parse(row.data||'{}')}catch{}
    return {id:row.id,date:row.date,staff:row.staff,start:row.start,duration:row.duration,status:row.status,
     customerName:clean(a.name,100),customerEmail:clean(a.email,200),customerPhone:clean(a.phone,40),
