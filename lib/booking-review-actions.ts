@@ -14,6 +14,10 @@ export async function reviewPendingRequest(owner:string,id:string,reviewer:strin
   return {ok:true,status:'declined'};
  }
  if(row.date<today())throw Error('This request is in the past. Decline it or ask the customer to book a future date.');
+ if(row.date===today()){
+  const currentClock=new Intl.DateTimeFormat('en-GB',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date()).split(':').map(Number);
+  if(row.start_minute<=currentClock[0]*60+currentClock[1])throw Error('This appointment time has already passed. Ask the customer to choose a future slot.');
+ }
  const config=JSON.parse(row.settings_data||'{}'),data=JSON.parse(row.details||'{}');
  const services=(config.services||[]).filter((s:{id:string})=>(data.serviceIds||[]).includes(s.id));
  const staff=(config.staff||[]).find((s:{id:string})=>s.id===row.staff_id);
