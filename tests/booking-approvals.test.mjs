@@ -52,7 +52,7 @@ test('v1.3.9 public booking is pending only when enabled; staff access is limite
  assert.match(handler,/isPublic&&approvalSettings\(config\).enabled/);
  assert.match(handler,/INSERT INTO booking_requests/);
  assert.match(handler,/confirmBooking\(/);
- assert.match(handler,/serviceCapacityOpen\(/);
+ assert.match(handler,/capacityOpen:serviceCapacityOpen/);
  const staffRoute=await read('app/api/team/review/route.ts');
  assert.match(staffRoute,/l.expires_at>now\(\)/);
  assert.match(staffRoute,/l.token_hash=\$1/);
