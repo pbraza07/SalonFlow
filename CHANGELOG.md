@@ -1,3 +1,12 @@
+## v1.3.9 — Optional booking approvals and service capacity (2026-10-09)
+- Business owners can enable booking approval notifications, choose the owner or an assigned staff member as reviewer, and view live in-app pending requests.
+- Team reviewers can use revocable, private, 30-day access links, with dedicated in-app request inbox and accept/decline actions; do not share owner credentials.
+- Online booking optionally creates a pending request; no calendar appointment or staff reservation is created until it is accepted. Declines leave the calendar unchanged; accepted requests are committed atomically with staff slots and service capacity checks.
+- Service catalog now supports 1–20 maximum simultaneous confirmed appointments per service. Staff cannot be double-booked even if service capacity is greater than 1.
+- Business categories are displayed alphabetically on registration.
+- New database migration 007 adds booking_requests and expiring team reviewer links, without changing existing appointments.
+- Customer confirmation displays a clear Pending Approval message where configured. Email, SMS and push delivery are not part of this release.
+
 ## SelahFlow v1.3.8 — Marketplace backfill and platform business drilldown (2026-10-09)
 - Existing approved active businesses, including previously non-listed businesses, are published to the marketplace by one-time additive migration 006.
 - The public marketplace returns all active businesses, independent of stale preexisting is_listed flags; pending, rejected and suspended businesses remain hidden.

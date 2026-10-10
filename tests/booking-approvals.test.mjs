@@ -1,0 +1,76 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+import {slotCapacity,validSlotCapacity,overlaps,serviceCapacityOpen} from '../server/booking-approvals.mjs';
+import {approvalSettings,bookingRequestDetail} from '../server/booking-review.mjs';
+const read=async f=>readFile(new URL('../'+f,import.meta.url),'utf8');
+test('v1.3.9 simultaneous service slots enforce capacity without overlapping staff booking',()=>{
+ assert.equal(validSlotCapacity(1),true);assert.equal(validSlotCapacity(20),true);
+ for(const x of [0,21,1.5,NaN,'3'])assert.equal(validSlotCapacity(x),false);
+ assert.equal(slotCapacity({maxSlots:undefined}),1);
+ const service={id:'barber',name:'Classic barber cut',maxSlots:2};
+ const existing=[{start:540,duration:30,status:'Confirmed',data:JSON.stringify({serviceIds:['barber'],services:['Classic barber cut']})}];
+ assert.equal(overlaps(540,30,570,30),false);
+ assert.equal(overlaps(550,30,540,30),true);
+ assert.equal(serviceCapacityOpen(existing,[service],555,30),true);
+ assert.equal(serviceCapacityOpen([...existing,...existing],[service],555,30),false);
+ assert.equal(serviceCapacityOpen(existing,[{...service,maxSlots:1}],555,30),false);
+ assert.equal(serviceCapacityOpen(existing,[service],570,30),true);
+ assert.equal(serviceCapacityOpen([{start:540,duration:30,status:'Confirmed',data:JSON.stringify({services:['Classic barber cut']})}],[{...service,maxSlots:1}],555,30),false);
+ assert.equal(serviceCapacityOpen([{...existing[0],status:'Cancelled'}],[{...service,maxSlots:1}],550,30),true);
+});
+test('v1.3.9 reviewer setting is opt-in and rejects absent team assignment',()=>{
+ const staff=[{id:'sam',name:'Sam'}];
+ assert.deepEqual(approvalSettings({staff}),{enabled:false,reviewer:'owner'});
+ assert.deepEqual(approvalSettings({staff,bookingApprovalEnabled:true,bookingApprovalReviewer:'sam'}),{enabled:true,reviewer:'sam'});
+ assert.deepEqual(approvalSettings({staff,bookingApprovalEnabled:true,bookingApprovalReviewer:'unknown'}),{enabled:true,reviewer:'owner'});
+ const detail=bookingRequestDetail({services:[{id:'cut',name:'Cut'}],staff:'sam',date:'2026-11-01',start:540,duration:30,buffer:15,name:'Client',email:'c@x.com',phone:'123',price:40,reviewer:'sam'});
+ assert.deepEqual(detail.serviceIds,['cut']);assert.equal(detail.customerName,'Client');assert.equal(detail.reviewer,'sam');
+});
+test('v1.3.9 migration preserves existing confirmed bookings and creates pending review without calendar reservation',async()=>{
+ const db=new PGlite();try{
+ for(const f of ['001_initial.sql','002_public_booking.sql','003_platform_foundation.sql','004_business_customization.sql','005_business_approval_terms.sql','006_marketplace_active_businesses.sql','007_booking_approval_requests.sql'])await db.exec(await read('migrations/'+f));
+ await db.query("INSERT INTO users(id,email,password_hash) VALUES('owner','owner@example.com','x')");
+ await db.query("INSERT INTO businesses(id,owner_id,slug,name,industry,status,is_listed) VALUES('business-id','owner','crawford','Crawford','barber','active',TRUE)");
+ await db.query("INSERT INTO appointments(id,owner,date,staff,start,duration,data,status) VALUES('old','owner','2026-11-01','sam',600,30,'{}','Confirmed')");
+ const detail={customerName:'New client',customerEmail:'new@example.com',services:['Haircut'],serviceIds:['cut'],quotedPrice:40};
+ await db.query("INSERT INTO booking_requests(id,business_id,owner_id,date,staff_id,start_minute,duration,details,reviewer) VALUES('req','business-id','owner','2026-11-01','sam',540,30,$1,'owner')",[JSON.stringify(detail)]);
+ assert.equal((await db.query("SELECT COUNT(*)::int AS n FROM appointments")).rows[0].n,1);
+ assert.equal((await db.query("SELECT COUNT(*)::int AS n FROM slots")).rows[0].n,0);
+ assert.equal((await db.query("SELECT status FROM booking_requests WHERE id='req'")).rows[0].status,'pending');
+ await db.query("UPDATE booking_requests SET status='declined',reviewed_by='owner',reviewed_at=now() WHERE id='req' AND status='pending'");
+ assert.equal((await db.query("SELECT COUNT(*)::int AS n FROM appointments")).rows[0].n,1);
+ await db.query("INSERT INTO booking_review_links(business_id,staff_id,token_hash,expires_at) VALUES('business-id','sam','hash1',now()+interval '30 days')");
+ await db.query("INSERT INTO booking_review_links(business_id,staff_id,token_hash,expires_at) VALUES('business-id','sam','hash2',now()+interval '30 days') ON CONFLICT(business_id,staff_id) DO UPDATE SET token_hash=excluded.token_hash,expires_at=excluded.expires_at");
+ assert.equal((await db.query("SELECT token_hash FROM booking_review_links")).rows[0].token_hash,'hash2');
+ await assert.rejects(db.query("INSERT INTO booking_requests(id,business_id,owner_id,date,staff_id,start_minute,duration,details,reviewer,status) VALUES('x','business-id','owner','2026-11-01','sam',540,30,'{}','owner','unauthorized')"));
+ }finally{await db.close();}
+});
+test('v1.3.9 public booking is pending only when enabled; staff access is limited',async()=>{
+ const handler=await read('lib/studio-handler.ts');
+ assert.match(handler,/isPublic&&approvalSettings\(config\).enabled/);
+ assert.match(handler,/INSERT INTO booking_requests/);
+ assert.match(handler,/confirmBooking\(/);
+ assert.match(handler,/serviceCapacityOpen\(/);
+ const staffRoute=await read('app/api/team/review/route.ts');
+ assert.match(staffRoute,/l.expires_at>now\(\)/);
+ assert.match(staffRoute,/l.token_hash=\$1/);
+ assert.match(staffRoute,/cfg.bookingApprovalReviewer!==link.staff_id/);
+ const ownerRoute=await read('app/api/studio/approvals/route.ts');
+ assert.match(ownerRoute,/requireOwner\(req\)/);
+ assert.match(ownerRoute,/tokenHash\(token\)/);
+ const atomic=await read('server/booking-approvals.mjs');
+ assert.match(atomic,/pg_advisory_xact_lock/);
+ assert.match(atomic,/FOR UPDATE/);
+ assert.match(atomic,/await client.query\('COMMIT'\)/);
+ const publicPage=await read('app/book/page.tsx');
+ assert.match(publicPage,/BOOKING REQUEST RECEIVED/);
+ assert.match(publicPage,/pendingApproval/);
+ const signup=await read('app/signup/page.tsx');
+ assert.match(signup,/localeCompare\(b\[1\]/);
+ const dashboard=await read('app/studio/owner-dashboard.tsx');
+ assert.match(dashboard,/OwnerBookingApprovals/);
+ assert.match(dashboard,/OwnerReviewInvite/);
+ assert.match(dashboard,/maximum simultaneous slots/);
+});
