@@ -1,3 +1,13 @@
+# v1.3.8 Release checks
+- npm ci; npm run typecheck; npm test; npm run build.
+- Migration 006 lists all preexisting active businesses without listing pending, rejected or suspended businesses.
+- Marketplace /discover and GET /api/marketplace include all active business accounts.
+- Platform admin /admin/platform shows business tiles, with expanded owner/business metadata, service list, staff list and customer booking history.
+- Click both Businesses and Listed businesses metrics to navigate to the business directory; click a business tile to see details.
+- GET /api/platform/businesses/:id returns 401 without session and 403 for nonadmins; it never exposes password hashes, raw auth data or client info through public endpoints.
+- Long-term tracking disappears entirely on owner Overview/Reports/Services if no term service or enrollments, and at platform level if no term enrollment records.
+- Existing business booking, Crawford, branding, subscriptions and data remain unchanged.
+
 # v1.3.7 Acceptance tests
 
 - New signup creates a pending business; owner is sent to /registration-status, private studio APIs return blocked and public /book/{slug} is inaccessible.
