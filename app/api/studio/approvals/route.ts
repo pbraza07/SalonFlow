@@ -4,6 +4,7 @@ import {requireOwner} from '../../../../lib/auth';
 import {validOrigin,tokenHash,trustedOrigin} from '../../../../server/security.mjs';
 import {deliveryProviderStatus,notifyBookingRequest} from '../../../../server/notification-delivery.mjs';
 import {reviewPendingRequest} from '../../../../lib/booking-review-actions';
+import {approvalFieldsForBusiness,sessionReviewSummary} from '../../../../server/booking-approval-display.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store'};
 async function context(req:Request){
@@ -19,10 +20,12 @@ export async function GET(req:Request){try{const {pool,owner,settings,business}=
   pool.query("SELECT DISTINCT ON (a.request_id,a.channel) a.request_id,a.channel,a.status,a.destination_masked,a.attempted_at::text AS attempted_at FROM booking_notification_attempts a JOIN booking_requests r ON r.id=a.request_id WHERE r.owner_id=$1 AND r.status='pending' ORDER BY a.request_id,a.channel,a.attempted_at DESC",[owner]),
   pool.query('SELECT email FROM users WHERE id=$1',[owner])
  ]);
- const rows=items.rows;
+ const rows=items.rows.map((r:{details:string;[key:string]:unknown})=>{const {details,...rest}=r;return {...rest,details:JSON.parse(details)};});
+ const confirmed=rows.length?(await pool.query("SELECT date,staff,start,duration,status,data FROM appointments WHERE owner=$1 AND date BETWEEN $2 AND $3 AND status NOT IN ('Cancelled','No-show') AND data LIKE '%sessionId%'",[owner,rows.reduce((d:string,r:{date:string})=>r.date<d?r.date:d,rows[0].date),rows.reduce((d:string,r:{date:string})=>r.date>d?r.date:d,rows[0].date)])).rows:[];
  const delivery:Record<string,Record<string,{status:string;destination:string;at:string}>>={};for(const a of attempts.rows){delivery[a.request_id]??={};delivery[a.request_id][a.channel]={status:a.status,destination:a.destination_masked,at:a.attempted_at};}
  return Response.json({enabled:settings.bookingApprovalEnabled===true,reviewer:settings.bookingApprovalReviewer||'owner',
- pending:rows.map((r:{details:string;[key:string]:unknown})=>{const {details,...rest}=r;return {...rest,details:JSON.parse(details)};}),
+ pending:rows.map((r:any)=>({...r,sessionInfo:sessionReviewSummary(settings,r,confirmed,rows)})),
+ approvalFields:approvalFieldsForBusiness(settings),
  customFields:(settings.bookingCustomFields||[]).map((f:{id:string;label:string})=>({id:f.id,label:f.label})),pendingCount:rows.length,businessId:business.id,providerStatus:deliveryProviderStatus(),accountEmail:account.rows[0]?.email||'',deliveryStatus:delivery},{headers});
  }catch(e){return err(e);}}
 export async function POST(req:Request){if(!validOrigin(req))return Response.json({error:'Invalid origin'},{status:403,headers});
