@@ -8,26 +8,71 @@ export const ATTENDED_STATUSES=new Set(['Checked in','Completed']);
 
 const clean=(value,max=250)=>typeof value==='string'?value.trim().slice(0,max):'';
 export function isAttended(status){return ATTENDED_STATUSES.has(status);}
+export function normalizeClientName(name){
+ return clean(name,100).replace(/\s+/g,' ').toLocaleLowerCase('en-US');
+}
+export function normalizeClientEmail(email){
+ const v=clean(email,254).toLowerCase();
+ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)?v:'';
+}
+export function normalizeClientPhone(phone){
+ const v=clean(phone,40).replace(/[\s().-]/g,'');
+ return /^\+?[0-9]{7,16}$/.test(v)?v:'';
+}
+/** Group bookings only when the provided full name matches AND at least
+ * one verified format of contact information (email or phone) matches.
+ * A second name using the same family email/phone gets a distinct card.
+ */
 export function customerIdentity(appointment){
  const data=typeof appointment.data==='string'?JSON.parse(appointment.data||'{}'):(appointment.data||appointment);
- const email=clean(data.email,254).toLowerCase();
- if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return 'email:'+email;
- const phone=clean(data.phone,40).replace(/[\s().-]/g,'');
- if(/^\+?[0-9]{7,16}$/.test(phone))return 'phone:'+phone;
- // Avoid accidentally combining unrelated customers with the same name.
- return 'appointment:'+String(appointment.id);
+ const name=normalizeClientName(data.name);
+ const email=normalizeClientEmail(data.email);
+ const phone=normalizeClientPhone(data.phone);
+ return name+'|'+(email?'email:'+email:phone?'phone:'+phone:'appointment:'+String(appointment.id));
 }
 export function buildClientDirectory(appointments,settings={},owner=''){
  const catalog=Array.isArray(settings.services)?settings.services:[];
  const employees=Array.isArray(settings.staff)?settings.staff:[];
- const clients=new Map();
+ const entries=[];
  for(const row of appointments||[]){
-  let data={};
+  let data;
   try{data=typeof row.data==='string'?JSON.parse(row.data||'{}'):(row.data||{});}catch{continue;}
   if(!data || typeof data!=='object')continue;
   const name=clean(data.name,100),email=clean(data.email,254),phone=clean(data.phone,40);
   if(!name&&!email&&!phone)continue;
-  const identity=customerIdentity({...row,data});
+  entries.push({row,data,name,email,phone,normalizedName:normalizeClientName(name),
+   normalizedEmail:normalizeClientEmail(email),normalizedPhone:normalizeClientPhone(phone)});
+ }
+ const parent=entries.map((_,i)=>i);
+ function find(n){while(parent[n]!==n){parent[n]=parent[parent[n]];n=parent[n];}return n;}
+ function join(a,b){const pa=find(a),pb=find(b);if(pa!==pb)parent[pb]=pa;}
+ const byEmail=new Map(),byPhone=new Map();
+ for(let i=0;i<entries.length;i++){
+  const e=entries[i];
+  if(!e.normalizedName)continue;
+  if(e.normalizedEmail){
+   const k=e.normalizedName+'\x1f'+e.normalizedEmail;
+   if(byEmail.has(k))join(i,byEmail.get(k));else byEmail.set(k,i);
+  }
+  if(e.normalizedPhone){
+   const k=e.normalizedName+'\x1f'+e.normalizedPhone;
+   if(byPhone.has(k))join(i,byPhone.get(k));else byPhone.set(k,i);
+  }
+ }
+ const contactsByRoot=new Map();
+ for(let i=0;i<entries.length;i++){
+  const root=find(i);
+  if(!contactsByRoot.has(root))contactsByRoot.set(root,[]);
+  if(entries[i].normalizedEmail)contactsByRoot.get(root).push('email:'+entries[i].normalizedEmail);
+  if(entries[i].normalizedPhone)contactsByRoot.get(root).push('phone:'+entries[i].normalizedPhone);
+ }
+ const clients=new Map();
+ for(let i=0;i<entries.length;i++){
+  const {row,data,name,email,phone,normalizedName}=entries[i];
+  const root=find(i);
+  const contacts=contactsByRoot.get(root)||[];
+  const stableContact=contacts.length?contacts.sort()[0]:'appointment:'+String(entries[root].row.id);
+  const identity=normalizedName+'\x1f'+stableContact;
   const id=createHash('sha256').update(owner+'\x1f'+identity).digest('hex').slice(0,32);
   let client=clients.get(id);
   if(!client){client={id,name:name||email||phone,email,phone,bookedSessions:0,attendedSessions:0,attendanceDays:[],serviceTypes:[],serviceNames:[],latestDate:'',history:[]};clients.set(id,client);}
