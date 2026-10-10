@@ -1,3 +1,9 @@
+# SelahFlow Studio v1.3.12 — Platform administrator access hotfix
+
+The primary platform administrator (`pbraza@gmail.com`) is automatically directed to `/admin/platform` after login, even when they also own Crawford. Non-administrator accounts requesting `/admin/platform` are directed to an informative `/admin/access-denied` page with an account-switch action instead of an unexplained Next.js 404. Logged-out users are sent to `/login?next=%2Fadmin%2Fplatform`.
+
+The original platform_admins server-side permission checks remain intact. This is a routing/UX fix only and preserves all data, service and Web Push features introduced in v1.3.11.
+
 # SelahFlow Studio 1.3.11 — Business-specific Web Push
 
 Owners and designated team reviewers can enable native device/browser notifications using their own device in the business's secure dashboard. When a customer requests approval, SelahFlow delivers a Web Push message to the currently authorized reviewers for that business. Tapping opens the review UI but does **not** accept a booking. In-app bells display unread and pending requests, with separate read receipts for each reviewer. iPhone (iOS/iPadOS 16.4+) requires Safari → Share → Add to Home Screen, then permission from the installed Home Screen app. Android and modern desktop browsers can enable notifications normally.

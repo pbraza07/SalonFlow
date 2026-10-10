@@ -19,7 +19,9 @@ export async function POST(req:Request){
   await pool.query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[tokenHash(token),user.id]);
   await pool.query('DELETE FROM login_attempts WHERE key=$1',[key]);
   const business=(await pool.query("SELECT slug,status FROM businesses WHERE owner_id=$1 LIMIT 1",[user.id])).rows[0];
-  const target=business?(business.status==='active'?dashboardPath(business.slug):'/registration-status'):await getPlatformRole(pool,user.id)?'/admin/platform':'/';
+  // Resolve the platform role BEFORE the business route. The primary administrator also owns Crawford.
+  const role=await getPlatformRole(pool,user.id);
+  const target=role?'/admin/platform':business?(business.status==='active'?dashboardPath(business.slug):'/registration-status'):'/';
   return Response.json({ok:true,dashboardUrl:target},{headers:{'Set-Cookie':cookie(token),'Cache-Control':'no-store'}});
  }catch(error){console.error('Login unavailable',error);return Response.json({error:'Sign-in is temporarily unavailable. Check the server database configuration.'},{status:503});}
 }
