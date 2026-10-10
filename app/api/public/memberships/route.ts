@@ -4,8 +4,8 @@ import {validOrigin,trustedOrigin} from '../../../../server/security.mjs';
 import {paymentConfigured,stripeApi} from '../../../../server/membership-payments.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const noStore={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
-const slugOk=s=>typeof s==='string'&&/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(s);
-const text=(s,max=250)=>typeof s==='string'?s.trim().slice(0,max):'';
+const slugOk=(s:unknown):s is string=>typeof s==='string'&&/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(s);
+const text=(s:unknown,max=250)=>typeof s==='string'?s.trim().slice(0,max):'';
 export async function GET(req:Request){
  const slug=new URL(req.url).searchParams.get('slug');
  if(!slugOk(slug))return Response.json({error:'Business not found.'},{status:404,headers:noStore});
