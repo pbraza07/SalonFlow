@@ -1,0 +1,78 @@
+import {randomUUID} from 'node:crypto';
+import {getPool} from '../../../../server/database.mjs';
+import {validOrigin,trustedOrigin} from '../../../../server/security.mjs';
+import {paymentConfigured,stripeApi} from '../../../../server/membership-payments.mjs';
+export const runtime='nodejs';export const dynamic='force-dynamic';
+const noStore={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
+const slugOk=s=>typeof s==='string'&&/^[a-z0-9][a-z0-9-]{1,58}[a-z0-9]$/.test(s);
+const text=(s,max=250)=>typeof s==='string'?s.trim().slice(0,max):'';
+export async function GET(req:Request){
+ const slug=new URL(req.url).searchParams.get('slug');
+ if(!slugOk(slug))return Response.json({error:'Business not found.'},{status:404,headers:noStore});
+ try{
+  const pool=getPool();
+  const b=(await pool.query("SELECT b.id,b.name,b.slug,b.brand_primary,b.brand_background,s.data AS settings_data,a.charges_enabled,a.onboarding_complete FROM businesses b LEFT JOIN settings s ON s.owner=b.owner_id LEFT JOIN merchant_accounts a ON a.business_id=b.id WHERE b.slug=$1 AND b.status='active'",[slug])).rows[0];
+  if(!b)return Response.json({error:'Business not found.'},{status:404,headers:noStore});
+  const plans=(await pool.query("SELECT id,name,description,interval_unit AS interval,price_cents AS \"priceCents\" FROM membership_plans WHERE business_id=$1 AND active=TRUE ORDER BY CASE interval_unit WHEN 'week' THEN 1 WHEN 'month' THEN 2 ELSE 3 END,name",[b.id])).rows;
+  let theme=null;try{theme=JSON.parse(b.settings_data||'{}').theme||null}catch{}
+  return Response.json({slug:b.slug,name:b.name,plans,brandPrimary:b.brand_primary,brandBackground:b.brand_background,theme,
+   canPay:paymentConfigured()&&b.charges_enabled===true&&b.onboarding_complete===true},{headers:noStore});
+ }catch{return Response.json({error:'Membership enrollment unavailable.'},{status:503,headers:noStore});}
+}
+export async function POST(req:Request){
+ if(!validOrigin(req))return Response.json({error:'Invalid origin.'},{status:403,headers:noStore});
+ try{
+  const raw=await req.text();if(raw.length>3000)throw Error('Invalid enrollment details.');
+  const body=JSON.parse(raw);
+  if(!slugOk(body.slug)||!/^[a-f0-9-]{36}$/i.test(body.planId||''))throw Error('Choose a valid membership.');
+  if(body.website)throw Error('Enrollment request not accepted.');
+  const name=text(body.name,101),email=text(body.email,255).toLowerCase();
+  if(name.length<2||name.length>100||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||email.length>254)
+   throw Error('Enter your full name and a valid email.');
+  if(body.termsAccepted!==true)throw Error('Please accept recurring billing and membership terms.');
+  if(!paymentConfigured())throw Error('Secure online membership payments are not available yet. Contact the business.');
+  const pool=getPool();
+  const item=(await pool.query(
+   "SELECT p.id,p.name,p.interval_unit,p.price_cents,b.id AS business_id,b.slug,b.name AS business_name,a.external_account_id,a.charges_enabled,a.onboarding_complete FROM membership_plans p JOIN businesses b ON b.id=p.business_id JOIN merchant_accounts a ON a.business_id=b.id WHERE b.slug=$1 AND p.id=$2 AND p.active=TRUE AND b.status='active'",
+   [body.slug,body.planId])).rows[0];
+  if(!item)throw Error('Membership is no longer available.');
+  if(item.charges_enabled!==true||item.onboarding_complete!==true)throw Error('Business payments are not yet ready.');
+  // Recheck Stripe before redirecting a customer, not merely locally cached flags.
+  const account=await stripeApi('accounts/'+item.external_account_id,{method:'GET'});
+  if(account.charges_enabled!==true||account.details_submitted!==true)
+   throw Error('Payments are temporarily unavailable for this business.');
+  const id=randomUUID(),origin=trustedOrigin(req);
+  await pool.query(
+   "INSERT INTO customer_memberships(id,business_id,plan_id,customer_name,customer_email,status,stripe_account_id) VALUES($1,$2,$3,$4,$5,'pending_payment',$6)",
+   [id,item.business_id,item.id,name,email,item.external_account_id]);
+  const session=await stripeApi('checkout/sessions',{account:item.external_account_id,
+   idempotencyKey:'membership-checkout-'+id,
+   params:{
+    mode:'subscription',
+    'payment_method_types[0]':'card',
+    'line_items[0][quantity]':'1',
+    'line_items[0][price_data][currency]':'usd',
+    'line_items[0][price_data][unit_amount]':String(item.price_cents),
+    'line_items[0][price_data][recurring][interval]':item.interval_unit,
+    'line_items[0][price_data][product_data][name]':item.business_name+' · '+item.name,
+    'line_items[0][price_data][product_data][description]':item.interval_unit+'ly recurring membership',
+    customer_email:email,
+    client_reference_id:id,
+    'metadata[membership_id]':id,
+    'metadata[selahflow_business_id]':item.business_id,
+    'subscription_data[metadata][membership_id]':id,
+    'subscription_data[metadata][selahflow_business_id]':item.business_id,
+    'subscription_data[description]':item.business_name+' · '+item.name,
+    'payment_method_collection':'always',
+    success_url:origin+'/membership/'+encodeURIComponent(item.slug)+'?checkout=success&session_id={CHECKOUT_SESSION_ID}',
+    cancel_url:origin+'/membership/'+encodeURIComponent(item.slug)+'?checkout=cancelled'
+   }});
+  if(!/^https:\/\/checkout\.stripe\.com\//.test(session.url||''))throw Error('Stripe could not create a secure checkout link.');
+  await pool.query('UPDATE customer_memberships SET stripe_checkout_session_id=$1,updated_at=now() WHERE id=$2 AND business_id=$3',
+    [session.id,id,item.business_id]);
+  return Response.json({checkoutUrl:session.url},{headers:noStore});
+ }catch(e){
+  const msg=(e as Error).message||'Unable to start checkout.';
+  return Response.json({error:msg},{status:/choose|enter|accept|valid|invalid/i.test(msg)?400:503,headers:noStore});
+ }
+}
