@@ -1,12 +1,12 @@
 import {randomBytes,randomUUID} from 'node:crypto';
-import {getPool} from '../../../../server/database.mjs';
-import {requireOwner} from '../../../../lib/auth';
-import {hashPassword,validOrigin} from '../../../../server/security.mjs';
-import {getPlatformRole} from '../../../../server/platform-roles.mjs';
-import {isReservedBusinessSlug} from '../../../../server/route-slugs.mjs';
-import {BUSINESS_INDUSTRIES,canonicalState} from '../../../../lib/business-options';
-import {defaultSettings} from '../../../../lib/defaults';
-import {validateManagedBusiness,canChangeManagedStatus,canArchiveBusiness} from '../../../../server/platform-business-management.mjs';
+import {getPool} from '../../../../../server/database.mjs';
+import {requireOwner} from '../../../../../lib/auth';
+import {hashPassword,validOrigin} from '../../../../../server/security.mjs';
+import {getPlatformRole} from '../../../../../server/platform-roles.mjs';
+import {isReservedBusinessSlug} from '../../../../../server/route-slugs.mjs';
+import {BUSINESS_INDUSTRIES,canonicalState} from '../../../../../lib/business-options';
+import {defaultSettings} from '../../../../../lib/defaults';
+import {validateManagedBusiness,canChangeManagedStatus,canArchiveBusiness} from '../../../../../server/platform-business-management.mjs';
 
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const h={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'};
