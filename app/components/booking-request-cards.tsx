@@ -46,6 +46,18 @@ export default function BookingRequestCards({
    {visible('quotedPrice')&&<div><small>Service quote</small><b>{money(item.details.quotedPrice||0)} <span className="sf-approval-unpaid">· No payment collected</span></b></div>}
    {visible('receivedAt')&&<div><small>Request received</small><b>{receiptTime(item.created_at)}</b></div>}
   </div>
+  <details className="sf-approval-all-submitted"><summary>View all customer-provided booking information</summary>
+   <div className="sf-approval-detail-grid">
+    <div><small>Name provided</small><b>{item.details.customerName}</b></div>
+    <div><small>Email provided</small><b>{item.details.customerEmail}</b></div>
+    <div><small>Phone provided</small><b>{item.details.customerPhone||'Not provided'}</b></div>
+    <div><small>Service(s)</small><b>{(item.details.services||[]).join(', ')}</b></div>
+    <div><small>Activity date and time</small><b>{activityDate(item.date)} · {approvalTime(item.start_minute)} Eastern</b></div>
+    <div><small>Quote</small><b>{money(item.details.quotedPrice||0)}</b></div>
+    {customFields.filter(f=>item.details.customAnswers?.[f.id]!==undefined).map(f=><div key={f.id}><small>{f.label}</small><b>{String(item.details.customAnswers?.[f.id])}</b></div>)}
+    {item.details.originalSubmission&&<div><small>Original customer name before any corrections</small><b>{item.details.originalSubmission.customerName}</b></div>}
+   </div>
+  </details>
   <div className="sf-approval-buttons">{onEdit&&<button type="button" className="outline sf-booking-edit-button" disabled={!!busy} onClick={()=>onEdit(item)}><Pencil size={16}/> Edit booking details</button>}<button type="button" className="primary" disabled={!!busy} onClick={()=>onReview(item.id,true)}>{busy===item.id?'Processing…':'Accept and add to calendar'}</button><button type="button" className="outline" disabled={!!busy} onClick={()=>onReview(item.id,false)}>Decline (no calendar change)</button></div>
  </article>)}</div>;
 }
